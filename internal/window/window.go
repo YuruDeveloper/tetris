@@ -36,7 +36,8 @@ func (instance *Window) Update() {
 	if err := gl.Init(); err != nil {
 		panic(err)
 	}	
-	gl.ClearColor(instance.background.Red,instance.background.Green,instance.background.Blue,instance.background.Alpha)
+	floatColor := instance.background.GetColor()
+	gl.ClearColor(floatColor.Red,floatColor.Green,floatColor.Blue,floatColor.Alpha)
 	for !instance.window.ShouldClose() {
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 		instance.window.SwapBuffers()
