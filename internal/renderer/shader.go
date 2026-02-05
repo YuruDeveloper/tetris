@@ -5,14 +5,17 @@ import (
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
-var VertexShaderSource , _ = gl.Strs("")
-var FragmentShaderSource , _ = gl.Strs("")
+var VertexShaderSource , FreeVertexShaderSource = gl.Strs("")
+var FragmentShaderSource , FreeFragmentShaderSource = gl.Strs("")
 
 type Shaders struct{
 	program uint32
 }
 
 func (instance *Shaders) CompileShaders() error {
+	if gl.IsProgram(instance.program) {
+		return packagederror.NewError(packagederror.AlreadyCompiled,"Already Compiled") 
+	}
 	vertexShader := gl.CreateShader(gl.VERTEX_SHADER)
 	gl.ShaderSource(vertexShader,1,VertexShaderSource,nil);
 	gl.CompileShader(vertexShader)
@@ -33,7 +36,12 @@ func (instance *Shaders) CompileShaders() error {
 	gl.LinkProgram(instance.program)
 	gl.DeleteShader(vertexShader)
 	gl.DeleteShader(fragmentShader)
-	return instance.checkProgramStatus(instance.program)
+	err = instance.checkProgramStatus(instance.program)
+	if err == nil {
+		FreeVertexShaderSource()
+		FreeFragmentShaderSource()
+	}
+	return err
 }
 
 func (instance *Shaders) checkShaderStatus(Shader uint32) error {
@@ -42,9 +50,9 @@ func (instance *Shaders) checkShaderStatus(Shader uint32) error {
 	if isCompile == gl.FALSE {
 		var maxLength int32
 		gl.GetShaderiv(Shader,gl.INFO_LOG_LENGTH,&maxLength)
-		var information *uint8
-		gl.GetShaderInfoLog(Shader,maxLength,&maxLength,information)
-		err := gl.GoStr(information)
+		information :=  make([]uint8,maxLength)
+		gl.GetShaderInfoLog(Shader,maxLength,&maxLength,&information[0])
+		err := gl.GoStr(&information[0])
 		return packagederror.NewError(packagederror.ShaderCompileFail,err)
 	}	
 	return nil
@@ -57,9 +65,9 @@ func (instance *Shaders) checkProgramStatus(program uint32) error {
 	if isLinked == gl.FALSE {
 		var maxLength int32
 		gl.GetProgramiv(program,gl.INFO_LOG_LENGTH,&maxLength)
-		var information *uint8
-		gl.GetProgramInfoLog(program,maxLength,&maxLength,information)
-		err := gl.GoStr(information)
+		information :=  make([]uint8,maxLength)
+		gl.GetProgramInfoLog(program,maxLength,&maxLength,&information[0])
+		err := gl.GoStr(&information[0])
 		return packagederror.NewError(packagederror.ProgramLinkFail,err)
 	}	
 	return nil

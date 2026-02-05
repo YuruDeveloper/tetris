@@ -8,7 +8,10 @@ import (
 
 func main() {
 	window := window.NewWindow()
-	window.Init(480,720,types.NewColor(1,1,1,1))
+	err := window.Init(480,720,types.NewColor(1,1,1,1))
+	if err != nil {
+		return
+	}
 	window.SetKeyCallBack(keyboard.KeyBoard)
-	window.Update()
+	err = window.Update()
 }

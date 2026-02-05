@@ -9,6 +9,8 @@ type ErrorCode uint
 const (
 	ShaderCompileFail = 100
 	ProgramLinkFail = 101
+
+	AlreadyCompiled = 1001
 )
 
 func NewError(code ErrorCode,str string) *PackagedError {

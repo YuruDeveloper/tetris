@@ -15,7 +15,7 @@ type Window  struct {
 	background types.Color
 }
 
-func (instance *Window) Init(width int, height int,color types.Color) {
+func (instance *Window) Init(width int, height int,color types.Color) error {
 	if err := glfw.Init() ; err != nil {
 		panic(err)
 	}
@@ -25,16 +25,17 @@ func (instance *Window) Init(width int, height int,color types.Color) {
 	glfw.WindowHint(glfw.Resizable,glfw.False)
 	window , err := glfw.CreateWindow(width,height,"Tetris",nil,nil)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	instance.window = window
 	instance.background = color
+	return nil
 }
 
-func (instance *Window) Update() {
+func (instance *Window) Update() error {
 	instance.window.MakeContextCurrent()
 	if err := gl.Init(); err != nil {
-		panic(err)
+		return err
 	}	
 	floatColor := instance.background.GetColor()
 	gl.ClearColor(floatColor.Red,floatColor.Green,floatColor.Blue,floatColor.Alpha)
@@ -44,6 +45,7 @@ func (instance *Window) Update() {
 		glfw.PollEvents()
 	}
 	glfw.Terminate()
+	return nil
 }
 
 func (instance *Window) Close() {
