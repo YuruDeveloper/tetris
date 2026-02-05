@@ -5,7 +5,7 @@ import(
 )
 
 func KeyBoard(window *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
-		if mods == glfw.ModControl && key == glfw.KeyC {
+		if (mods & glfw.ModControl) != 0 && key == glfw.KeyC {
 			window.SetShouldClose(true)
 		}	
 }
