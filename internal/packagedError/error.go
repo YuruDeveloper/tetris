@@ -7,8 +7,14 @@ var _ error = (*PackagedError)(nil)
 type ErrorCode uint
 
 const (
+	FailReadFile = 001	
+
 	ShaderCompileFail = 100
 	ProgramLinkFail = 101
+
+	FailGLFWInitError = 200
+	FailGLInitError = 201
+	FailCreateWindow = 202
 
 	AlreadyCompiled = 1001
 )

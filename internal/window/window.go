@@ -1,6 +1,7 @@
 package window
 
 import (
+	packagederror "gitea.bytedev.duckdns.org/tetris/internal/packagedError"
 	"gitea.bytedev.duckdns.org/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -17,7 +18,8 @@ type Window  struct {
 
 func (instance *Window) Init(width int, height int,color types.Color) error {
 	if err := glfw.Init() ; err != nil {
-		panic(err)
+		glfw.Terminate()
+		return packagederror.NewError(packagederror.FailGLFWInitError,err.Error())
 	}
 	glfw.WindowHint(glfw.ContextVersionMajor,4)
 	glfw.WindowHint(glfw.ContextVersionMinor,6)
@@ -25,18 +27,20 @@ func (instance *Window) Init(width int, height int,color types.Color) error {
 	glfw.WindowHint(glfw.Resizable,glfw.False)
 	window , err := glfw.CreateWindow(width,height,"Tetris",nil,nil)
 	if err != nil {
-		return err
+		glfw.Terminate()
+		return packagederror.NewError(packagederror.FailCreateWindow,err.Error())
 	}
 	instance.window = window
 	instance.background = color
+	instance.window.MakeContextCurrent()
+	if err := gl.Init(); err != nil {
+		glfw.Terminate()
+		return packagederror.NewError(packagederror.FailGLInitError,err.Error())
+	}	
 	return nil
 }
 
 func (instance *Window) Update() error {
-	instance.window.MakeContextCurrent()
-	if err := gl.Init(); err != nil {
-		return err
-	}	
 	floatColor := instance.background.GetColor()
 	gl.ClearColor(floatColor.Red,floatColor.Green,floatColor.Blue,floatColor.Alpha)
 	for !instance.window.ShouldClose() {
