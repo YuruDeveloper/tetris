@@ -18,10 +18,10 @@ type Shaders struct{
 	program uint32
 	vertexShaderSource **uint8
 	freeVertexShaderSource func()
-	vertexShaderSourceLenght int32
+	vertexShaderSourceLength int32
 	fragmentShaderSource **uint8
 	freeFragmentShaderSource func()
-	fregmentSahderSourceLenght int32
+	fragmentShaderSourceLength int32
 }
 
 func (instance *Shaders)LoadFiles() error {
@@ -33,13 +33,13 @@ func (instance *Shaders)LoadFiles() error {
 		return packagederror.NewError(packagederror.FailReadFile,err.Error())
 	}
 	instance.vertexShaderSource , instance.freeVertexShaderSource = gl.Strs(string(data))
-	instance.vertexShaderSourceLenght = int32(len(string(data)))
+	instance.vertexShaderSourceLength = int32(len(string(data)))
 	data , err = os.ReadFile(FragmentShaderFile)
 	if err != nil {
 		return packagederror.NewError(packagederror.FailReadFile,err.Error())
 	}
 	instance.fragmentShaderSource , instance.freeFragmentShaderSource = gl.Strs(string(data))
-	instance.fregmentSahderSourceLenght = int32(len(string(data)))
+	instance.fragmentShaderSourceLength = int32(len(string(data)))
 	return nil
 }
 
@@ -48,14 +48,14 @@ func (instance *Shaders) CompileShaders() error {
 		return packagederror.NewError(packagederror.AlreadyCompiled,"Already Compiled") 
 	}
 	vertexShader := gl.CreateShader(gl.VERTEX_SHADER)
-	gl.ShaderSource(vertexShader,1,instance.vertexShaderSource,&instance.vertexShaderSourceLenght);
+	gl.ShaderSource(vertexShader,1,instance.vertexShaderSource,&instance.vertexShaderSourceLength)
 	gl.CompileShader(vertexShader)
 	err := instance.checkShaderStatus(vertexShader)
 	if err != nil {
 		return err
 	}
 	fragmentShader := gl.CreateShader(gl.FRAGMENT_SHADER)
-	gl.ShaderSource(fragmentShader,1,instance.fragmentShaderSource,&instance.fregmentSahderSourceLenght)
+	gl.ShaderSource(fragmentShader,1,instance.fragmentShaderSource,&instance.fragmentShaderSourceLength)
 	gl.CompileShader(fragmentShader)
 	err = instance.checkShaderStatus(fragmentShader)
 	if err != nil {
@@ -112,4 +112,11 @@ func (instance *Shaders) checkProgramStatus(program uint32) error {
 
 func (instance *Shaders) GetProgram() uint32 {
 	return instance.program
+}
+
+func (instance *Shaders) CleanProgram() {
+	if instance.program == 0 || !gl.IsProgram(instance.program) {
+		return
+	}
+	gl.DeleteProgram(instance.program)
 }
