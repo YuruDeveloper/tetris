@@ -27,6 +27,7 @@ func main() {
 		fmt.Print(err)
 		return
 	}
+	window.SetProgram(shaders.GetProgram())
 	window.SetKeyCallBack(keyboard.KeyBoard)
 	err = window.Update()
 	if err != nil {

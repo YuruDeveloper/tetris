@@ -14,6 +14,7 @@ func NewWindow() *Window {
 type Window  struct {
 	window *glfw.Window
 	background types.Color
+	program uint32
 }
 
 func (instance *Window) Init(width int, height int,color types.Color) error {
@@ -45,6 +46,9 @@ func (instance *Window) Update() error {
 	gl.ClearColor(floatColor.Red,floatColor.Green,floatColor.Blue,floatColor.Alpha)
 	for !instance.window.ShouldClose() {
 		gl.Clear(gl.COLOR_BUFFER_BIT)
+		if instance.program != 0 && gl.IsProgram(instance.program) {
+			gl.UseProgram(instance.program)
+		}
 		instance.window.SwapBuffers()
 		glfw.PollEvents()
 	}
@@ -64,4 +68,8 @@ func (instance *Window) SetKeyCallBack(callback glfw.KeyCallback) {
 		return
 	}
 	instance.window.SetKeyCallback(callback)
+}
+
+func (instance *Window) SetProgram(program uint32) {
+	instance.program = program
 }
