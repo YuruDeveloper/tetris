@@ -1,8 +1,8 @@
 package window
 
 import (
-	packagederror "gitea.bytedev.duckdns.org/tetris/internal/packagedError"
-	"gitea.bytedev.duckdns.org/tetris/internal/types"
+	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
+	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )

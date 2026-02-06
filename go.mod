@@ -1,4 +1,4 @@
-module gitea.bytedev.duckdns.org/tetris
+module github.com/YuruDeveloper/tetris
 
 go 1.24.6
 

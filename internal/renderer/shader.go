@@ -3,7 +3,7 @@ package renderer
 import (
 	"os"
 
-	packagederror "gitea.bytedev.duckdns.org/tetris/internal/packagedError"
+	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 

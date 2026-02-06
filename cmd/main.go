@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"gitea.bytedev.duckdns.org/tetris/internal/keyboard"
-	"gitea.bytedev.duckdns.org/tetris/internal/renderer"
-	"gitea.bytedev.duckdns.org/tetris/internal/types"
-	"gitea.bytedev.duckdns.org/tetris/internal/window"
+	"github.com/YuruDeveloper/tetris/internal/keyboard"
+	"github.com/YuruDeveloper/tetris/internal/renderer"
+	"github.com/YuruDeveloper/tetris/internal/types"
+	"github.com/YuruDeveloper/tetris/internal/window"
 )
 
 func main() {
