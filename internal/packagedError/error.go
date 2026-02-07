@@ -32,5 +32,5 @@ type PackagedError struct {
 }
 
 func (instance *PackagedError) Error() string {
-	return fmt.Sprintf("error[%d]  %s",instance.errorCode,instance.errorString)
+	return fmt.Sprintf("error[%-3d]  %s",instance.errorCode,instance.errorString)
 }

@@ -2,10 +2,14 @@ package window
 
 import (
 	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
+	"github.com/YuruDeveloper/tetris/internal/ports"
 	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
+
+const TargetFPS = 144.0
+const TargetDeltaTime = 1.0 / TargetFPS
 
 func NewWindow() *Window {
 	return &Window{}
@@ -14,7 +18,6 @@ func NewWindow() *Window {
 type Window  struct {
 	window *glfw.Window
 	background types.Color
-	program uint32
 }
 
 func (instance *Window) Init(width int, height int,color types.Color) error {
@@ -37,21 +40,27 @@ func (instance *Window) Init(width int, height int,color types.Color) error {
 	if err := gl.Init(); err != nil {
 		glfw.Terminate()
 		return packagederror.NewError(packagederror.FailGLInitError,err.Error())
-	}	
+	}
 	return nil
 }
 
-func (instance *Window) Update() error {
+func (instance *Window) Update(renderer ports.Renderer) error {
 	floatColor := instance.background.GetColor()
 	gl.ClearColor(floatColor.Red,floatColor.Green,floatColor.Blue,floatColor.Alpha)
+	var currentTime float64
+	var lastTime float64
+	var deltaTime float64
 	for !instance.window.ShouldClose() {
-		gl.Clear(gl.COLOR_BUFFER_BIT)
-		if instance.program != 0 && gl.IsProgram(instance.program) {
-			gl.UseProgram(instance.program)
+		currentTime = glfw.GetTime()
+		deltaTime = currentTime - lastTime
+		if deltaTime >= TargetDeltaTime {
+			lastTime = currentTime
+			renderer.Rendering()
+			instance.window.SwapBuffers()
+			glfw.PollEvents()
 		}
-		instance.window.SwapBuffers()
-		glfw.PollEvents()
 	}
+	
 	glfw.Terminate()
 	return nil
 }
@@ -68,8 +77,4 @@ func (instance *Window) SetKeyCallBack(callback glfw.KeyCallback) {
 		return
 	}
 	instance.window.SetKeyCallback(callback)
-}
-
-func (instance *Window) SetProgram(program uint32) {
-	instance.program = program
 }

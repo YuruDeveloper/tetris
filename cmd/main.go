@@ -16,23 +16,29 @@ func main() {
 		log.Fatalln(err)
 		return
 	}
+	
 	shaders := renderer.NewShaders()
 	err = shaders.LoadFiles()
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
+	
 	err = shaders.CompileShaders()
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
-	window.SetProgram(shaders.GetProgram())
+	
+	renderer := renderer.NewRenderer(shaders.GetProgram())
+
 	window.SetKeyCallBack(keyboard.KeyBoard)
-	err = window.Update()
+	
+	err = window.Update(renderer)
+	
 	if err != nil {
 		log.Fatalln(err)
-		return
 	}
+	
 	shaders.CleanProgram()
 }

@@ -8,7 +8,7 @@ import (
 )
 
 const VertexShaderFile = "./public/vertexShader.vs"
-const FragmentShaderFile = "./public/fragmentShader.vs"  
+const FragmentShaderFile = "./public/fragmentShader.fs"  
 
 func NewShaders() *Shaders {
 	return &Shaders{}
