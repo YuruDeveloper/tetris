@@ -23,14 +23,19 @@ type Renderer struct {
 
 func (instance *Renderer) Init() {
 	vertices := []types.Vector2 {
-		types.NewVector2(-0.2,-0.1),
+		types.NewVector2(0.2,0.1),
 		types.NewVector2(0.2,-0.1),
-		types.NewVector2(0.0,0.1),
+		types.NewVector2(-0.2,-0.1),
+		types.NewVector2(-0.2,0.1),
+	}
+	indices := []uint32 {
+		0 ,1 ,2,
+		0, 2, 3,
 	}
 	triID := uuid.New()
 
 	instance.datas[triID] = NewRenderingData()
-	instance.datas[triID].InitData(vertices,types.NewVector2(1,1),types.NewVector2(0,0))
+	instance.datas[triID].InitData(vertices,indices)
 	gl.BindVertexArray(instance.datas[triID].GetVertexArrayObject())
 }
 
@@ -38,7 +43,7 @@ func (instance *Renderer) Init() {
 func (instance *Renderer) Rendering() {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 	gl.UseProgram(instance.program)
-	gl.DrawArrays(gl.TRIANGLES,0,3)
+	gl.DrawElementsWithOffset(gl.TRIANGLES,6,gl.UNSIGNED_INT,0)
 }
 
 func (instance *Renderer) ClearDatas() {
