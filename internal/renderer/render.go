@@ -13,12 +13,14 @@ func NewRenderer(program uint32) *Renderer {
 	return &Renderer{
 		program: program,
 		datas: make(map[uuid.UUID]*RenderingData),
+		locationX: -1,
 	}
 }
 
 type Renderer struct {
 	program uint32
 	datas map[uuid.UUID]*RenderingData
+	locationX float32
 }
 
 func (instance *Renderer) Init() {
@@ -35,15 +37,21 @@ func (instance *Renderer) Init() {
 	triID := uuid.New()
 
 	instance.datas[triID] = NewRenderingData()
-	instance.datas[triID].InitData(vertices,indices)
-	gl.BindVertexArray(instance.datas[triID].GetVertexArrayObject())
+	instance.datas[triID].InitData(vertices,indices,types.NewVector2(1,1),types.NewVector2(0,0))
 }
 
 
-func (instance *Renderer) Rendering() {
+func (instance *Renderer) Rendering(deltaTime float64) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 	gl.UseProgram(instance.program)
-	gl.DrawElementsWithOffset(gl.TRIANGLES,6,gl.UNSIGNED_INT,0)
+	for _ , data := range instance.datas {
+			instance.locationX += float32(0.1 * deltaTime)
+		if instance.locationX >= 1 {
+			instance.locationX = -1
+		}
+		data.SetLocation(types.NewVector2(instance.locationX,0))
+		data.Rendering(instance.program)
+	}
 }
 
 func (instance *Renderer) ClearDatas() {

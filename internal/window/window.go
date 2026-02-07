@@ -41,6 +41,7 @@ func (instance *Window) Init(width int, height int,color types.Color) error {
 		glfw.Terminate()
 		return packagederror.NewError(packagederror.FailGLInitError,err.Error())
 	}
+	glfw.SwapInterval(1)
 	return nil
 }
 
@@ -54,12 +55,10 @@ func (instance *Window) Update(renderer ports.Renderer) error {
 	for !instance.window.ShouldClose() {
 		currentTime = glfw.GetTime()
 		deltaTime = currentTime - lastTime
-		if deltaTime >= TargetDeltaTime {
-			lastTime = currentTime
-			renderer.Rendering()
-			instance.window.SwapBuffers()
-			glfw.PollEvents()
-		}
+		lastTime = currentTime
+		renderer.Rendering(deltaTime)
+		instance.window.SwapBuffers()
+		glfw.PollEvents()
 	}
 	
 	glfw.Terminate()

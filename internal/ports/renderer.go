@@ -1,5 +1,5 @@
 package ports
 
 type Renderer interface {
-	Rendering()
+	Rendering(deltaTime float64)
 }
