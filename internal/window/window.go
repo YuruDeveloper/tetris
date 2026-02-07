@@ -50,6 +50,7 @@ func (instance *Window) Update(renderer ports.Renderer) error {
 	var currentTime float64
 	var lastTime float64
 	var deltaTime float64
+	lastTime = glfw.GetTime()
 	for !instance.window.ShouldClose() {
 		currentTime = glfw.GetTime()
 		deltaTime = currentTime - lastTime

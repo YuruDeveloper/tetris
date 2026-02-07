@@ -31,7 +31,7 @@ func main() {
 	}
 	
 	renderer := renderer.NewRenderer(shaders.GetProgram())
-
+	renderer.Init()
 	window.SetKeyCallBack(keyboard.KeyBoard)
 	
 	err = window.Update(renderer)
@@ -39,6 +39,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	
+
+	renderer.ClearDatas()
 	shaders.CleanProgram()
 }

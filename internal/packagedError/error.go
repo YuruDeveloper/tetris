@@ -7,16 +7,16 @@ var _ error = (*PackagedError)(nil)
 type ErrorCode uint
 
 const (
-	FailReadFile = 001	
+	FailGLFWInitError = 001
+	FailGLInitError = 002
+	FailCreateWindow = 003
+	
+	FailReadFile = 100	
 
-	ShaderCompileFail = 100
-	ProgramLinkFail = 101
+	ShaderCompileFail = 200
+	ProgramLinkFail = 201
 
-	FailGLFWInitError = 200
-	FailGLInitError = 201
-	FailCreateWindow = 202
-
-	AlreadyCompiled = 1001
+	AlreadyCompiled = 300
 )
 
 func NewError(code ErrorCode,str string) *PackagedError {
