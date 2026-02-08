@@ -8,62 +8,62 @@ import (
 )
 
 const VertexShaderFile = "./public/vertexShader.vs"
-const FragmentShaderFile = "./public/fragmentShader.fs"  
+const FragmentShaderFile = "./public/fragmentShader.fs"
 
 func NewShaders() *Shaders {
 	return &Shaders{}
 }
 
-type Shaders struct{
-	program uint32
-	vertexShaderSource **uint8
-	freeVertexShaderSource func()
-	vertexShaderSourceLength int32
-	fragmentShaderSource **uint8
-	freeFragmentShaderSource func()
+type Shaders struct {
+	program                    uint32
+	vertexShaderSource         **uint8
+	freeVertexShaderSource     func()
+	vertexShaderSourceLength   int32
+	fragmentShaderSource       **uint8
+	freeFragmentShaderSource   func()
 	fragmentShaderSourceLength int32
 }
 
-func (instance *Shaders)LoadFiles() error {
+func (instance *Shaders) LoadFiles() error {
 	if instance.program != 0 && gl.IsProgram(instance.program) {
-		return packagederror.NewError(packagederror.AlreadyCompiled,"Already Compiled") 
+		return packagederror.NewError(packagederror.AlreadyCompiled, "Already Compiled")
 	}
-	data , err := os.ReadFile(VertexShaderFile)
+	data, err := os.ReadFile(VertexShaderFile)
 	if err != nil {
-		return packagederror.NewError(packagederror.FailReadFile,err.Error())
+		return packagederror.NewError(packagederror.FailReadFile, err.Error())
 	}
-	instance.vertexShaderSource , instance.freeVertexShaderSource = gl.Strs(string(data))
+	instance.vertexShaderSource, instance.freeVertexShaderSource = gl.Strs(string(data))
 	instance.vertexShaderSourceLength = int32(len(string(data)))
-	data , err = os.ReadFile(FragmentShaderFile)
+	data, err = os.ReadFile(FragmentShaderFile)
 	if err != nil {
-		return packagederror.NewError(packagederror.FailReadFile,err.Error())
+		return packagederror.NewError(packagederror.FailReadFile, err.Error())
 	}
-	instance.fragmentShaderSource , instance.freeFragmentShaderSource = gl.Strs(string(data))
+	instance.fragmentShaderSource, instance.freeFragmentShaderSource = gl.Strs(string(data))
 	instance.fragmentShaderSourceLength = int32(len(string(data)))
 	return nil
 }
 
 func (instance *Shaders) CompileShaders() error {
 	if instance.program != 0 && gl.IsProgram(instance.program) {
-		return packagederror.NewError(packagederror.AlreadyCompiled,"Already Compiled") 
+		return packagederror.NewError(packagederror.AlreadyCompiled, "Already Compiled")
 	}
 	vertexShader := gl.CreateShader(gl.VERTEX_SHADER)
-	gl.ShaderSource(vertexShader,1,instance.vertexShaderSource,&instance.vertexShaderSourceLength)
+	gl.ShaderSource(vertexShader, 1, instance.vertexShaderSource, &instance.vertexShaderSourceLength)
 	gl.CompileShader(vertexShader)
 	err := instance.checkShaderStatus(vertexShader)
 	if err != nil {
 		return err
 	}
 	fragmentShader := gl.CreateShader(gl.FRAGMENT_SHADER)
-	gl.ShaderSource(fragmentShader,1,instance.fragmentShaderSource,&instance.fragmentShaderSourceLength)
+	gl.ShaderSource(fragmentShader, 1, instance.fragmentShaderSource, &instance.fragmentShaderSourceLength)
 	gl.CompileShader(fragmentShader)
 	err = instance.checkShaderStatus(fragmentShader)
 	if err != nil {
 		return err
 	}
 	instance.program = gl.CreateProgram()
-	gl.AttachShader(instance.program,vertexShader)
-	gl.AttachShader(instance.program,fragmentShader)
+	gl.AttachShader(instance.program, vertexShader)
+	gl.AttachShader(instance.program, fragmentShader)
 	gl.LinkProgram(instance.program)
 	gl.DeleteShader(vertexShader)
 	gl.DeleteShader(fragmentShader)
@@ -77,36 +77,35 @@ func (instance *Shaders) CompileShaders() error {
 
 func (instance *Shaders) checkShaderStatus(Shader uint32) error {
 	var isCompile int32
-	gl.GetShaderiv(Shader,gl.COMPILE_STATUS,&isCompile)
+	gl.GetShaderiv(Shader, gl.COMPILE_STATUS, &isCompile)
 	if isCompile == gl.FALSE {
 		var maxLength int32
-		gl.GetShaderiv(Shader,gl.INFO_LOG_LENGTH,&maxLength)
+		gl.GetShaderiv(Shader, gl.INFO_LOG_LENGTH, &maxLength)
 		if maxLength == 0 {
-			return packagederror.NewError(packagederror.ShaderCompileFail,"No Logs")
+			return packagederror.NewError(packagederror.ShaderCompileFail, "No Logs")
 		}
-		information :=  make([]uint8,maxLength)
-		gl.GetShaderInfoLog(Shader,maxLength,&maxLength,&information[0])
+		information := make([]uint8, maxLength)
+		gl.GetShaderInfoLog(Shader, maxLength, &maxLength, &information[0])
 		err := gl.GoStr(&information[0])
-		return packagederror.NewError(packagederror.ShaderCompileFail,err)
-	}	
+		return packagederror.NewError(packagederror.ShaderCompileFail, err)
+	}
 	return nil
 }
 
-
 func (instance *Shaders) checkProgramStatus(program uint32) error {
 	var isLinked int32
-	gl.GetProgramiv(program,gl.LINK_STATUS,&isLinked)
+	gl.GetProgramiv(program, gl.LINK_STATUS, &isLinked)
 	if isLinked == gl.FALSE {
 		var maxLength int32
-		gl.GetProgramiv(program,gl.INFO_LOG_LENGTH,&maxLength)
+		gl.GetProgramiv(program, gl.INFO_LOG_LENGTH, &maxLength)
 		if maxLength == 0 {
-			return packagederror.NewError(packagederror.ProgramLinkFail,"No Logs")
+			return packagederror.NewError(packagederror.ProgramLinkFail, "No Logs")
 		}
-		information :=  make([]uint8,maxLength)
-		gl.GetProgramInfoLog(program,maxLength,&maxLength,&information[0])
+		information := make([]uint8, maxLength)
+		gl.GetProgramInfoLog(program, maxLength, &maxLength, &information[0])
 		err := gl.GoStr(&information[0])
-		return packagederror.NewError(packagederror.ProgramLinkFail,err)
-	}	
+		return packagederror.NewError(packagederror.ProgramLinkFail, err)
+	}
 	return nil
 }
 

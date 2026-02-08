@@ -8,29 +8,36 @@ type ErrorCode uint
 
 const (
 	FailGLFWInitError = 001
-	FailGLInitError = 002
-	FailCreateWindow = 003
-	
-	FailReadFile = 100	
+	FailGLInitError   = 002
+	FailCreateWindow  = 003
 
-	ShaderCompileFail = 200
-	ProgramLinkFail = 201
+	FailReadFile = 100
+	FailOpenFile = 101
 
-	AlreadyCompiled = 300
+	FailDecodeImage  = 200
+	FailConvertImage = 201
+
+	ShaderCompileFail = 300
+	ProgramLinkFail   = 301
+
+	AlreadyCompiled         = 400
+	DataArrayIsEmpty        = 401
+	FailCreateRenderingData = 402
+	UnSupportedDataType     = 403
 )
 
-func NewError(code ErrorCode,str string) *PackagedError {
+func NewError(code ErrorCode, str string) *PackagedError {
 	return &PackagedError{
-		errorCode: code,
+		errorCode:   code,
 		errorString: str,
 	}
 }
 
 type PackagedError struct {
-	errorCode ErrorCode
+	errorCode   ErrorCode
 	errorString string
 }
 
 func (instance *PackagedError) Error() string {
-	return fmt.Sprintf("error[%-3d]  %s",instance.errorCode,instance.errorString)
+	return fmt.Sprintf("error[%-3d]  %s", instance.errorCode, instance.errorString)
 }

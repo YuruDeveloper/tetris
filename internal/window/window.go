@@ -15,31 +15,31 @@ func NewWindow() *Window {
 	return &Window{}
 }
 
-type Window  struct {
-	window *glfw.Window
+type Window struct {
+	window     *glfw.Window
 	background types.Color
 }
 
-func (instance *Window) Init(width int, height int,color types.Color) error {
-	if err := glfw.Init() ; err != nil {
+func (instance *Window) Init(width int, height int, color types.Color) error {
+	if err := glfw.Init(); err != nil {
 		glfw.Terminate()
-		return packagederror.NewError(packagederror.FailGLFWInitError,err.Error())
+		return packagederror.NewError(packagederror.FailGLFWInitError, err.Error())
 	}
-	glfw.WindowHint(glfw.ContextVersionMajor,4)
-	glfw.WindowHint(glfw.ContextVersionMinor,6)
-	glfw.WindowHint(glfw.OpenGLProfile,glfw.OpenGLCoreProfile)
-	glfw.WindowHint(glfw.Resizable,glfw.False)
-	window , err := glfw.CreateWindow(width,height,"Tetris",nil,nil)
+	glfw.WindowHint(glfw.ContextVersionMajor, 4)
+	glfw.WindowHint(glfw.ContextVersionMinor, 6)
+	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
+	glfw.WindowHint(glfw.Resizable, glfw.False)
+	window, err := glfw.CreateWindow(width, height, "Tetris", nil, nil)
 	if err != nil {
 		glfw.Terminate()
-		return packagederror.NewError(packagederror.FailCreateWindow,err.Error())
+		return packagederror.NewError(packagederror.FailCreateWindow, err.Error())
 	}
 	instance.window = window
 	instance.background = color
 	instance.window.MakeContextCurrent()
 	if err := gl.Init(); err != nil {
 		glfw.Terminate()
-		return packagederror.NewError(packagederror.FailGLInitError,err.Error())
+		return packagederror.NewError(packagederror.FailGLInitError, err.Error())
 	}
 	glfw.SwapInterval(1)
 	return nil
@@ -47,7 +47,7 @@ func (instance *Window) Init(width int, height int,color types.Color) error {
 
 func (instance *Window) Update(renderer ports.Renderer) error {
 	floatColor := instance.background.GetColor()
-	gl.ClearColor(floatColor.Red,floatColor.Green,floatColor.Blue,floatColor.Alpha)
+	gl.ClearColor(floatColor.Red, floatColor.Green, floatColor.Blue, floatColor.Alpha)
 	var currentTime float64
 	var lastTime float64
 	var deltaTime float64
@@ -60,7 +60,7 @@ func (instance *Window) Update(renderer ports.Renderer) error {
 		instance.window.SwapBuffers()
 		glfw.PollEvents()
 	}
-	
+
 	glfw.Terminate()
 	return nil
 }
