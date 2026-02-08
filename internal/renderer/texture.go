@@ -46,10 +46,10 @@ func (instance *Texture) LoadTextureImage(filePath string) error {
 	return nil
 }
 
-func (instance *Texture) Rendering(vertexArrayObject uint32) {
-	gl.BindTexture(vertexArrayObject, instance.texture)
+func (instance *Texture) Rendering() {
+	gl.BindTexture(gl.TEXTURE_2D, instance.texture)
 }
 
-func (instance *Texture) DeleteTexture() {
+func (instance *Texture) Delete() {
 	gl.DeleteTextures(1, &instance.texture)
 }

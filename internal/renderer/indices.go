@@ -7,11 +7,14 @@ type IndicesBuffer struct {
 
 func NewIndicesBuffer(indices []uint32) (*IndicesBuffer, error) {
 	buffer, err := NewBuffer(indices)
+	if err != nil {
+		return nil , err
+	}
 	count := int32(len(indices))
 	return &IndicesBuffer{
 		Buffer: buffer,
 		count:  count,
-	}, err
+	}, nil
 }
 
 func (instance *IndicesBuffer) GetIndicesCount() int32 {

@@ -18,7 +18,7 @@ func (instance *Sync) NewFence() {
 
 func (instance *Sync) WaitSync() {
 	if instance.fence != 0 {
-		gl.ClientWaitSync(instance.fence, gl.SYNC_FLUSH_COMMANDS_BIT, TimeOut)
+		gl.ClientWaitSync(instance.fence,0, TimeOut)
 		gl.DeleteSync(instance.fence)
 		instance.fence = 0
 	}

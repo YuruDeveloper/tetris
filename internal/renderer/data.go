@@ -41,22 +41,21 @@ func (instance *RenderingData[T]) Init(transformIndex uint32, program uint32) er
 		return err
 	}
 	gl.BindBufferBase(gl.UNIFORM_BUFFER, instance.transformIndex, instance.transform.GetBuffer())
+	instance.transform.Binding(program, instance.programIndex, instance.transformIndex)
 	return nil
 }
 
 func (instance *RenderingData[T]) SetLocation(location T) {
 	instance.transform.SetLocation(location)
-	instance.sync.WaitSync()
 }
 
 func (instance *RenderingData[T]) SetSize(size T) {
 	instance.transform.SetSize(size)
-	instance.sync.WaitSync()
 }
 
 func (instance *RenderingData[T]) Rendering(program uint32) {
-	instance.transform.Binding(program, instance.programIndex, instance.transformIndex)
-	instance.texture.Rendering(instance.mesh.vertexArrayObject)
+	instance.sync.WaitSync()
+	instance.texture.Rendering()
 	instance.mesh.Rendering()
 	instance.sync.NewFence()
 }
