@@ -28,7 +28,7 @@ type Texture struct {
 }
 
 func (instance *Texture) LoadTextureImage(image *image.NRGBA, width,height,level int32) {
-	gl.TextureStorage2D(instance.texture, 1, gl.RGBA, width, height)
+	gl.TextureStorage2D(instance.texture, 1, gl.RGBA8, width, height)
 	gl.TextureSubImage2D(instance.texture, level, 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, unsafe.Pointer(&image.Pix[0]))
 }
 

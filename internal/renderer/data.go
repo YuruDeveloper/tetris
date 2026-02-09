@@ -6,11 +6,11 @@ import (
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
-func NewRenderingData[T types.Vector](vertex []T, indices []uint32, size T, location T,program types.Program, texture types.Texture) (*RenderingData[T], error) {
+func NewRenderingData[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2, size T, location T,program types.Program, texture types.Texture) (*RenderingData[T], error) {
 	if len(vertex) == 0 || len(indices) == 0  {
 		return nil, packagederror.NewError(packagederror.FailCreateRenderingData, "Something is empty or nil")
 	}
-	mesh, err := NewMesh(vertex, indices)
+	mesh, err := NewMesh(vertex, indices,uv)
 	if err != nil {
 		return nil, err
 	}
@@ -43,6 +43,9 @@ func (instance *RenderingData[T]) Init(transformIndex uint32) error {
 		return err
 	}
 	gl.BindBufferBase(gl.UNIFORM_BUFFER, instance.transformIndex, instance.transform.GetBuffer())
+	gl.UseProgram(uint32(instance.shader))
+	samplerLocation := gl.GetUniformLocation(uint32(instance.shader),gl.Str("textureMap\x00"))
+    gl.Uniform1i(samplerLocation, 0)
 	instance.transform.Binding(uint32(instance.shader), instance.programIndex, instance.transformIndex)
 	return nil
 }
@@ -58,6 +61,8 @@ func (instance *RenderingData[T]) SetSize(size T) {
 func (instance *RenderingData[T]) Rendering() {
 	instance.sync.WaitSync()
 	gl.UseProgram(uint32(instance.shader))
+	gl.ActiveTexture(gl.TEXTURE0)
+	gl.BindTexture(gl.TEXTURE_2D,uint32(instance.texture))
 	instance.mesh.Rendering()
 	instance.sync.NewFence()
 }

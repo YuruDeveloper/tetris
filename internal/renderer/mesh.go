@@ -11,10 +11,11 @@ import (
 type Mesh[T types.Vector] struct {
 	vertexBuffer      *Buffer[T]
 	indicesBuffer     *IndicesBuffer
+	uvBuffer *Buffer[types.Vector2]
 	vertexArrayObject uint32
 }
 
-func NewMesh[T types.Vector](vertex []T, indices []uint32) (*Mesh[T], error) {
+func NewMesh[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2) (*Mesh[T], error) {
 	vertexBuffer, err := NewBuffer(vertex)
 	if err != nil {
 		return nil, err
@@ -24,11 +25,18 @@ func NewMesh[T types.Vector](vertex []T, indices []uint32) (*Mesh[T], error) {
 		vertexBuffer.Delete()
 		return nil, err
 	}
+	uvBuffer , err := NewBuffer(uv)
+	if err != nil {
+		vertexBuffer.Delete()
+		indicesBuffer.Delete()
+		return nil , err
+	}
 	var vertexArrayObject uint32
 	gl.CreateVertexArrays(1, &vertexArrayObject)
 	return &Mesh[T]{
 		vertexBuffer:      vertexBuffer,
 		indicesBuffer:     indicesBuffer,
+		uvBuffer: uvBuffer,
 		vertexArrayObject: vertexArrayObject,
 	}, nil
 }
@@ -41,14 +49,20 @@ func (instance *Mesh[T]) Init() error {
 		return packagederror.NewError(packagederror.UnSupportedDataType, "This Type is not supported")
 	}
 	// location 열기
-	gl.EnableVertexArrayAttrib(instance.vertexArrayObject, 0)
-	// 실제 바인딩
-	// mapping
+	gl.EnableVertexArrayAttrib(instance.vertexArrayObject, VertexBufferObjectIndex)
+	gl.EnableVertexArrayAttrib(instance.vertexArrayObject, UVBufferIndex)
+	// vao binding and format setup
 	gl.VertexArrayVertexBuffer(instance.vertexArrayObject, VertexBufferObjectIndex, instance.vertexBuffer.GetDataBuffer(), 0, size)
-	gl.VertexArrayAttribFormat(instance.vertexArrayObject, 0, count, gl.FLOAT, false, 0)
+	gl.VertexArrayAttribFormat(instance.vertexArrayObject, VertexBufferObjectIndex, count, gl.FLOAT, false, 0)
+	// vao binding and format setup
+	gl.VertexArrayVertexBuffer(instance.vertexArrayObject,UVBufferIndex,instance.uvBuffer.GetDataBuffer(),0,int32(FloatDataSize * 2))
+	gl.VertexArrayAttribFormat(instance.vertexArrayObject,UVBufferIndex,2,gl.FLOAT,false,0)
 	//	binding
-	gl.VertexArrayAttribBinding(instance.vertexArrayObject, 0, VertexBufferObjectIndex)
+	gl.VertexArrayAttribBinding(instance.vertexArrayObject, VertexBufferObjectIndex, VertexBufferObjectIndex)
+	gl.VertexArrayAttribBinding(instance.vertexArrayObject,UVBufferIndex,UVBufferIndex)
+	// 
 	gl.VertexArrayElementBuffer(instance.vertexArrayObject, instance.indicesBuffer.GetDataBuffer())
+
 	gl.VertexArrayBindingDivisor(instance.vertexArrayObject, VertexBufferObjectIndex, 0)
 	return nil
 }
