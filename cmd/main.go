@@ -28,7 +28,7 @@ func main() {
 		log.Fatalln(err)
 		return
 	}
-	data, err := renderer.NewRenderingData([]types.Vector2{
+	data, err := renderer.NewRenderObject([]types.Vector2{
 		types.NewVector2(0.1, 0.1),
 		types.NewVector2(0.1, -0.1),
 		types.NewVector2(-0.1, 0.1),

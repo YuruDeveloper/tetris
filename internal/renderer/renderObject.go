@@ -6,7 +6,7 @@ import (
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
-func NewRenderingData[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2, size T, location T,program types.Program, texture types.Texture) (*RenderingData[T], error) {
+func NewRenderObject[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2, size T, location T,program types.Program, texture types.Texture) (*RenderObject[T], error) {
 	if len(vertex) == 0 || len(indices) == 0  {
 		return nil, packagederror.NewError(packagederror.FailCreateRenderingData, "Something is empty or nil")
 	}
@@ -15,7 +15,7 @@ func NewRenderingData[T types.Vector](vertex []T, indices []uint32,uv []types.Ve
 		return nil, err
 	}
 	transform := NewTransform(size, location)
-	return &RenderingData[T]{
+	return &RenderObject[T]{
 		mesh:      mesh,
 		texture:   texture,
 		shader: program,
@@ -24,7 +24,7 @@ func NewRenderingData[T types.Vector](vertex []T, indices []uint32,uv []types.Ve
 	}, nil
 }
 
-type RenderingData[T types.Vector] struct {
+type RenderObject[T types.Vector] struct {
 	mesh           *Mesh[T]
 	transform      *Transform[T]
 	texture        types.Texture
@@ -34,7 +34,7 @@ type RenderingData[T types.Vector] struct {
 	sync           *Sync
 }
 
-func (instance *RenderingData[T]) Init(transformIndex uint32) error {
+func (instance *RenderObject[T]) Init(transformIndex uint32) error {
 	instance.transformIndex = transformIndex
 	instance.programIndex = gl.GetUniformBlockIndex(uint32(instance.shader), gl.Str("TransformBlock\x00"))
 	err := instance.mesh.Init()
@@ -50,15 +50,15 @@ func (instance *RenderingData[T]) Init(transformIndex uint32) error {
 	return nil
 }
 
-func (instance *RenderingData[T]) SetLocation(location T) {
+func (instance *RenderObject[T]) SetLocation(location T) {
 	instance.transform.SetLocation(location)
 }
 
-func (instance *RenderingData[T]) SetSize(size T) {
+func (instance *RenderObject[T]) SetSize(size T) {
 	instance.transform.SetSize(size)
 }
 
-func (instance *RenderingData[T]) Rendering() {
+func (instance *RenderObject[T]) Rendering() {
 	instance.sync.WaitSync()
 	gl.UseProgram(uint32(instance.shader))
 	gl.ActiveTexture(gl.TEXTURE0)
@@ -67,7 +67,7 @@ func (instance *RenderingData[T]) Rendering() {
 	instance.sync.NewFence()
 }
 
-func (instance *RenderingData[T]) Delete() {
+func (instance *RenderObject[T]) Delete() {
 	instance.mesh.Delete()
 	instance.transform.Delete()
 	instance.sync.Delete()

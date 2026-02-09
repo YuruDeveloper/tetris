@@ -11,16 +11,16 @@ var _ ports.Renderer = (*Renderer)(nil)
 
 func NewRenderer() *Renderer {
 	return &Renderer{
-		datas:   make(map[uuid.UUID]*RenderingData[types.Vector2]),
+		datas:   make(map[uuid.UUID]*RenderObject[types.Vector2]),
 	}
 }
 
 type Renderer struct {
-	datas   map[uuid.UUID]*RenderingData[types.Vector2]
+	datas   map[uuid.UUID]*RenderObject[types.Vector2]
 	locationX float64
 }
 
-func (instance *Renderer) Set(data *RenderingData[types.Vector2]) {
+func (instance *Renderer) Set(data *RenderObject[types.Vector2]) {
 	instance.datas[uuid.New()] = data
 }
 
