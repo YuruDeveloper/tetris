@@ -55,7 +55,6 @@ func (instance *RenderingData[T]) SetSize(size T) {
 
 func (instance *RenderingData[T]) Rendering(program uint32) {
 	instance.sync.WaitSync()
-	instance.texture.Rendering()
 	instance.mesh.Rendering()
 	instance.sync.NewFence()
 }

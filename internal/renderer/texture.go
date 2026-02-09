@@ -25,7 +25,7 @@ type Texture struct {
 	texture uint32
 }
 
-func (instance *Texture) LoadTextureImage(filePath string) error {
+func (instance *Texture) LoadTextureImage(filePath string,level int32) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return packagederror.NewError(packagederror.FailOpenFile, err.Error())
@@ -42,12 +42,12 @@ func (instance *Texture) LoadTextureImage(filePath string) error {
 	if !ok {
 		return packagederror.NewError(packagederror.FailConvertImage, "FailToConvertImage")
 	}
-	gl.TextureSubImage2D(instance.texture, 0, 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, unsafe.Pointer(&rgba.Pix[0]))
+	gl.TextureSubImage2D(instance.texture, level, 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, unsafe.Pointer(&rgba.Pix[0]))
 	return nil
 }
 
-func (instance *Texture) Rendering() {
-	gl.BindTexture(gl.TEXTURE_2D, instance.texture)
+func (instance *Texture) GetTexture() uint32 {
+	return instance.texture
 }
 
 func (instance *Texture) Delete() {
