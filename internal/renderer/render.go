@@ -17,6 +17,7 @@ func NewRenderer() *Renderer {
 
 type Renderer struct {
 	datas   map[uuid.UUID]*RenderingData[types.Vector2]
+	locationX float64
 }
 
 func (instance *Renderer) Set(data *RenderingData[types.Vector2]) {
@@ -26,6 +27,11 @@ func (instance *Renderer) Set(data *RenderingData[types.Vector2]) {
 func (instance *Renderer) Rendering(deltaTime float64) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 	for _, data := range instance.datas {
+		instance.locationX += deltaTime * 0.1
+		if instance.locationX >= 1 {
+			instance.locationX = -1
+		}
+		data.SetLocation(types.NewVector2(float32(instance.locationX),0))
 		data.Rendering()
 	}
 }
