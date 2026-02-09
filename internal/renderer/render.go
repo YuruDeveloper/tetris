@@ -9,23 +9,24 @@ import (
 
 var _ ports.Renderer = (*Renderer)(nil)
 
-func NewRenderer(program uint32) *Renderer {
+func NewRenderer() *Renderer {
 	return &Renderer{
-		program: program,
 		datas:   make(map[uuid.UUID]*RenderingData[types.Vector2]),
 	}
 }
 
 type Renderer struct {
-	program uint32
 	datas   map[uuid.UUID]*RenderingData[types.Vector2]
+}
+
+func (instance *Renderer) Set(data *RenderingData[types.Vector2]) {
+	instance.datas[uuid.New()] = data
 }
 
 func (instance *Renderer) Rendering(deltaTime float64) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
-	gl.UseProgram(instance.program)
 	for _, data := range instance.datas {
-		data.Rendering(instance.program)
+		data.Rendering()
 	}
 }
 

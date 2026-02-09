@@ -66,7 +66,7 @@ func (instance *AssetManager) register(uuid uuid.UUID,createFunc func() ports.As
 	instance.mutex.Lock()
 	defer instance.mutex.Unlock()
 	if _ , ok := instance.factoryList[uuid] ; ok {
-		return packagederror.NewError(packagederror.FailRegisterDuplicate,"Alreay regitryed factory")
+		return packagederror.NewError(packagederror.FailRegisterDuplicate,"Already registered")
 	}
 	instance.factoryList[uuid] = createFunc
 	return nil

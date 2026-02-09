@@ -9,7 +9,6 @@ import (
 	"github.com/YuruDeveloper/tetris/internal/ports"
 	"github.com/YuruDeveloper/tetris/internal/renderer"
 	"github.com/YuruDeveloper/tetris/internal/types"
-	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
 var _ ports.Asset = (*TextureAsset)(nil)
@@ -18,6 +17,7 @@ func newTextureAsset(textureFile string) *TextureAsset {
 	return &TextureAsset{
 		textureFile: textureFile,
 		texture: renderer.NewTexture(),
+		loaded: false,
 	} 
 }
 
@@ -25,10 +25,11 @@ type TextureAsset struct {
 	textureFile string
 	texture ports.Texture
 	level int32
+	loaded bool
 }
 
 func (instance *TextureAsset) IsLoaded() bool {
-	return gl.IsTexture(uint32(instance.texture.GetTexture()))
+	return instance.loaded
 }
 
 func (instance *TextureAsset) Load() error {
@@ -39,6 +40,7 @@ func (instance *TextureAsset) Load() error {
 }
 
 func (instance *TextureAsset) UnLoad() {
+	instance.loaded = false
 	instance.texture.Delete()
 }
 
@@ -59,6 +61,7 @@ func (instance *TextureAsset) init() error {
 		return packagederror.NewError(packagederror.FailConvertImage, "FailToConvertImage")
 	}
 	instance.texture.LoadTextureImage(rgba,width,height,instance.level)
+	instance.loaded = true
 	return nil
 }
 

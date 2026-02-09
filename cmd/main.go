@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	asset "github.com/YuruDeveloper/tetris/internal/assets"
 	"github.com/YuruDeveloper/tetris/internal/keyboard"
 	"github.com/YuruDeveloper/tetris/internal/renderer"
 	"github.com/YuruDeveloper/tetris/internal/types"
@@ -17,20 +18,41 @@ func main() {
 		return
 	}
 
-	shaders := renderer.NewShaders()
-	err = shaders.LoadFiles()
+	shader, err := asset.GetAssetManager().ShaderAsset(asset.DefaultShaderID)
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
-
-	err = shaders.CompileShaders()
+	texture, err := asset.GetAssetManager().TextureAsset(asset.DefaultTextureID)
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
+	data, err := renderer.NewRenderingData([]types.Vector2{
+		types.NewVector2(0.1, 0.1),
+		types.NewVector2(0.1, -0.1),
+		types.NewVector2(-0.1, 0.1),
+		types.NewVector2(-0.1, -0.1),
+	},
+	[]uint32{
+		0, 1, 2, 2, 3, 1,
+	},
+	types.NewVector2(1, 1),
+	types.NewVector2(0, 0),
+	shader.Get(),
+	texture.Get(),
+	)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+	if err := data.Init(0); err != nil {
+		log.Fatalln(err)
+		return
+	}
 
-	renderer := renderer.NewRenderer(shaders.GetProgram())
+	renderer := renderer.NewRenderer()
+	renderer.Set(data)
 	window.SetKeyCallBack(keyboard.KeyBoard)
 
 	err = window.Update(renderer)
@@ -38,7 +60,6 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	renderer.ClearDatas()
-	shaders.CleanProgram()
+	asset.GetAssetManager().Release(asset.DefaultShaderID)
+	asset.GetAssetManager().Release(asset.DefaultTextureID)
 }
