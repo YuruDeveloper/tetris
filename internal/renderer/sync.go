@@ -2,7 +2,7 @@ package renderer
 
 import "github.com/go-gl/gl/v4.6-core/gl"
 
-const TimeOut = 100
+const TimeOut = 100000000
 
 type Sync struct {
 	fence uintptr
@@ -13,12 +13,12 @@ func NewSync() *Sync {
 }
 
 func (instance *Sync) NewFence() {
-	instance.fence = gl.FenceSync(gl.SYNC_FLUSH_COMMANDS_BIT, 0)
+	instance.fence = gl.FenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0)
 }
 
 func (instance *Sync) WaitSync() {
 	if instance.fence != 0 {
-		gl.ClientWaitSync(instance.fence,0, TimeOut)
+		gl.ClientWaitSync(instance.fence, gl.SYNC_FLUSH_COMMANDS_BIT, TimeOut)
 		gl.DeleteSync(instance.fence)
 		instance.fence = 0
 	}

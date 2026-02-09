@@ -11,12 +11,12 @@ var _ ports.Renderer = (*Renderer)(nil)
 
 func NewRenderer() *Renderer {
 	return &Renderer{
-		datas:   make(map[uuid.UUID]*RenderObject[types.Vector2]),
+		datas: make(map[uuid.UUID]*RenderObject[types.Vector2]),
 	}
 }
 
 type Renderer struct {
-	datas   map[uuid.UUID]*RenderObject[types.Vector2]
+	datas     map[uuid.UUID]*RenderObject[types.Vector2]
 	locationX float64
 }
 
@@ -31,7 +31,7 @@ func (instance *Renderer) Rendering(deltaTime float64) {
 		if instance.locationX >= 1 {
 			instance.locationX = -1
 		}
-		data.SetLocation(types.NewVector2(float32(instance.locationX),0))
+		data.SetLocation(types.NewVector2(float32(instance.locationX), 0))
 		data.Rendering()
 	}
 }

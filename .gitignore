@@ -26,4 +26,5 @@ go.work.sum
 .env
 build
 .claude
+CLAUDE.md
 
