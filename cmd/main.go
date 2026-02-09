@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"runtime"
 
 	asset "github.com/YuruDeveloper/tetris/internal/assets"
 	"github.com/YuruDeveloper/tetris/internal/keyboard"
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	runtime.LockOSThread()
 	window := window.NewWindow()
 	err := window.Init(480, 720, types.NewColor(255, 255, 255, 255))
 	if err != nil {
