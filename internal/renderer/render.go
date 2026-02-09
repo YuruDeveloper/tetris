@@ -29,7 +29,7 @@ func (instance *Renderer) Rendering(deltaTime float64) {
 	}
 }
 
-func (instance *Renderer) ClearDatas() {
+func (instance *Renderer) Delete() {
 	for _, data := range instance.datas {
 		data.Delete()
 	}

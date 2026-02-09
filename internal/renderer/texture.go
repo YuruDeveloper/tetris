@@ -1,13 +1,15 @@
 package renderer
 
 import (
-	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
-	"github.com/go-gl/gl/v4.6-core/gl"
 	"image"
-	"image/png"
-	"os"
 	"unsafe"
+
+	"github.com/YuruDeveloper/tetris/internal/ports"
+	"github.com/YuruDeveloper/tetris/internal/types"
+	"github.com/go-gl/gl/v4.6-core/gl"
 )
+
+var _ ports.Texture = (*Texture)(nil)
 
 func NewTexture() *Texture {
 	var texture uint32
@@ -25,29 +27,13 @@ type Texture struct {
 	texture uint32
 }
 
-func (instance *Texture) LoadTextureImage(filePath string,level int32) error {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return packagederror.NewError(packagederror.FailOpenFile, err.Error())
-	}
-	defer file.Close()
-	img, err := png.Decode(file)
-	if err != nil {
-		return packagederror.NewError(packagederror.FailDecodeImage, err.Error())
-	}
-	width := int32(img.Bounds().Dx())
-	height := int32(img.Bounds().Dy())
+func (instance *Texture) LoadTextureImage(image *image.NRGBA, width,height,level int32) {
 	gl.TextureStorage2D(instance.texture, 1, gl.RGBA, width, height)
-	rgba, ok := img.(*image.NRGBA)
-	if !ok {
-		return packagederror.NewError(packagederror.FailConvertImage, "FailToConvertImage")
-	}
-	gl.TextureSubImage2D(instance.texture, level, 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, unsafe.Pointer(&rgba.Pix[0]))
-	return nil
+	gl.TextureSubImage2D(instance.texture, level, 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, unsafe.Pointer(&image.Pix[0]))
 }
 
-func (instance *Texture) GetTexture() uint32 {
-	return instance.texture
+func (instance *Texture) GetTexture() types.Texture {
+	return types.Texture(instance.texture)
 }
 
 func (instance *Texture) Delete() {

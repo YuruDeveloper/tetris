@@ -20,3 +20,6 @@ type PackedTransform[T Vector] struct {
 	Size     T
 	Location T
 }
+
+type Program uint32
+type Texture uint32

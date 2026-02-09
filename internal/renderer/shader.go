@@ -1,61 +1,35 @@
 package renderer
 
 import (
-	"os"
-
 	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
+	"github.com/YuruDeveloper/tetris/internal/ports"
+	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
-const VertexShaderFile = "./public/vertexShader.vs"
-const FragmentShaderFile = "./public/fragmentShader.fs"
+var _ ports.Shader = (*Shader)(nil)
 
-func NewShaders() *Shaders {
-	return &Shaders{}
+func NewShaders() ports.Shader {
+	return &Shader{}
 }
 
-type Shaders struct {
-	program                    uint32
-	vertexShaderSource         **uint8
-	freeVertexShaderSource     func()
-	vertexShaderSourceLength   int32
-	fragmentShaderSource       **uint8
-	freeFragmentShaderSource   func()
-	fragmentShaderSourceLength int32
+type Shader struct {
+	program uint32
 }
 
-func (instance *Shaders) LoadFiles() error {
-	if instance.program != 0 && gl.IsProgram(instance.program) {
-		return packagederror.NewError(packagederror.AlreadyCompiled, "Already Compiled")
-	}
-	data, err := os.ReadFile(VertexShaderFile)
-	if err != nil {
-		return packagederror.NewError(packagederror.FailReadFile, err.Error())
-	}
-	instance.vertexShaderSource, instance.freeVertexShaderSource = gl.Strs(string(data))
-	instance.vertexShaderSourceLength = int32(len(string(data)))
-	data, err = os.ReadFile(FragmentShaderFile)
-	if err != nil {
-		return packagederror.NewError(packagederror.FailReadFile, err.Error())
-	}
-	instance.fragmentShaderSource, instance.freeFragmentShaderSource = gl.Strs(string(data))
-	instance.fragmentShaderSourceLength = int32(len(string(data)))
-	return nil
-}
-
-func (instance *Shaders) CompileShaders() error {
+func (instance *Shader) CompileShader(vertexShaderSource **uint8,vertexShaderSourceLength int32,fragmentShaderSource **uint8,fragmentShaderSourceLength int32) error {
 	if instance.program != 0 && gl.IsProgram(instance.program) {
 		return packagederror.NewError(packagederror.AlreadyCompiled, "Already Compiled")
 	}
 	vertexShader := gl.CreateShader(gl.VERTEX_SHADER)
-	gl.ShaderSource(vertexShader, 1, instance.vertexShaderSource, &instance.vertexShaderSourceLength)
+	gl.ShaderSource(vertexShader, 1, vertexShaderSource, &vertexShaderSourceLength)
 	gl.CompileShader(vertexShader)
 	err := instance.checkShaderStatus(vertexShader)
 	if err != nil {
 		return err
 	}
 	fragmentShader := gl.CreateShader(gl.FRAGMENT_SHADER)
-	gl.ShaderSource(fragmentShader, 1, instance.fragmentShaderSource, &instance.fragmentShaderSourceLength)
+	gl.ShaderSource(fragmentShader, 1, fragmentShaderSource, &fragmentShaderSourceLength)
 	gl.CompileShader(fragmentShader)
 	err = instance.checkShaderStatus(fragmentShader)
 	if err != nil {
@@ -68,14 +42,10 @@ func (instance *Shaders) CompileShaders() error {
 	gl.DeleteShader(vertexShader)
 	gl.DeleteShader(fragmentShader)
 	err = instance.checkProgramStatus(instance.program)
-	if err == nil {
-		instance.freeVertexShaderSource()
-		instance.freeFragmentShaderSource()
-	}
 	return err
 }
 
-func (instance *Shaders) checkShaderStatus(Shader uint32) error {
+func (instance *Shader) checkShaderStatus(Shader uint32) error {
 	var isCompile int32
 	gl.GetShaderiv(Shader, gl.COMPILE_STATUS, &isCompile)
 	if isCompile == gl.FALSE {
@@ -92,7 +62,7 @@ func (instance *Shaders) checkShaderStatus(Shader uint32) error {
 	return nil
 }
 
-func (instance *Shaders) checkProgramStatus(program uint32) error {
+func (instance *Shader) checkProgramStatus(program uint32) error {
 	var isLinked int32
 	gl.GetProgramiv(program, gl.LINK_STATUS, &isLinked)
 	if isLinked == gl.FALSE {
@@ -109,11 +79,11 @@ func (instance *Shaders) checkProgramStatus(program uint32) error {
 	return nil
 }
 
-func (instance *Shaders) GetProgram() uint32 {
-	return instance.program
+func (instance *Shader) GetProgram() types.Program {
+	return types.Program(instance.program)
 }
 
-func (instance *Shaders) CleanProgram() {
+func (instance *Shader) Delete() {
 	if instance.program == 0 || !gl.IsProgram(instance.program) {
 		return
 	}

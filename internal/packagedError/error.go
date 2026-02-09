@@ -24,6 +24,10 @@ const (
 	DataArrayIsEmpty        = 401
 	FailCreateRenderingData = 402
 	UnSupportedDataType     = 403
+
+	UnknownAsset = 500
+	FailAssetTypeConvert = 501
+	FailRegisterDuplicate = 502
 )
 
 func NewError(code ErrorCode, str string) *PackagedError {
