@@ -6,7 +6,7 @@ import (
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
-func NewRenderObject[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2, size T, location T,program types.Program, texture types.Texture) (*RenderObject[T], error) {
+func NewRenderObject[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2, size T, location T,viewportSize types.Vector2,program types.Program, texture types.Texture) (*RenderObject[T], error) {
 	if len(vertex) == 0 || len(indices) == 0  {
 		return nil, packagederror.NewError(packagederror.FailCreateRenderingData, "Something is empty or nil")
 	}
@@ -14,7 +14,7 @@ func NewRenderObject[T types.Vector](vertex []T, indices []uint32,uv []types.Vec
 	if err != nil {
 		return nil, err
 	}
-	transform := NewTransform(size, location)
+	transform := NewTransform(size, location,viewportSize)
 	return &RenderObject[T]{
 		mesh:      mesh,
 		texture:   texture,

@@ -19,6 +19,7 @@ func NewVector2(x float32, y float32) Vector2 {
 type PackedTransform[T Vector] struct {
 	Size     T
 	Location T
+	ViewportSize Vector2
 }
 
 type Program uint32

@@ -12,12 +12,12 @@ type Transform[T types.Vector] struct {
 	transform       unsafe.Pointer
 }
 
-func NewTransform[T types.Vector](size T, location T) *Transform[T] {
+func NewTransform[T types.Vector](size T, location T,viewportSize types.Vector2) *Transform[T] {
 	var transformBuffer uint32
 	flag := gl.MAP_WRITE_BIT | gl.MAP_PERSISTENT_BIT | gl.MAP_COHERENT_BIT
 	gl.CreateBuffers(1, &transformBuffer)
-	gl.NamedBufferStorage(transformBuffer, FloatDataSize*4, unsafe.Pointer(&types.PackedTransform[T]{Size: size, Location: location}), uint32(flag))
-	transform := gl.MapNamedBufferRange(transformBuffer, 0, FloatDataSize*4, uint32(flag))
+	gl.NamedBufferStorage(transformBuffer, FloatDataSize*6, unsafe.Pointer(&types.PackedTransform[T]{Size: size, Location: location , ViewportSize : viewportSize }), uint32(flag))
+	transform := gl.MapNamedBufferRange(transformBuffer, 0, FloatDataSize*6, uint32(flag))
 
 	return &Transform[T]{
 		transformBuffer: transformBuffer,

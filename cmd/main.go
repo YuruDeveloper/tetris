@@ -31,22 +31,23 @@ func main() {
 		return
 	}
 	data, err := renderer.NewRenderObject([]types.Vector2{
-		types.NewVector2(0.1, 0.1),
-		types.NewVector2(0.1, -0.1),
-		types.NewVector2(-0.1, 0.1),
-		types.NewVector2(-0.1, -0.1),
+		types.NewVector2(1, 1),
+		types.NewVector2(1, -1),
+		types.NewVector2(-1, 1),
+		types.NewVector2(-1, -1),
 	},
 	[]uint32{
 		0, 1, 2, 2, 3, 1,
 	},
 	[]types.Vector2{
-		types.NewVector2(1.0,1.0),
 		types.NewVector2(1.0,0.0),
-		types.NewVector2(0.0,1.0),
+		types.NewVector2(1.0,1.0),
 		types.NewVector2(0.0,0.0),
+		types.NewVector2(0.0,1.0),
 	},
-	types.NewVector2(1, 1),
-	types.NewVector2(0, 0),
+	types.NewVector2(10, 10),
+	types.NewVector2(0, 10),
+	types.NewVector2(480,720),
 	shader.Get(),
 	texture.Get(),
 	)
