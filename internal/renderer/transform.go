@@ -7,6 +7,8 @@ import (
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
+const TransformIndex = uint32(0)
+
 type Transform[T types.Vector] struct {
 	transformBuffer uint32
 	transform       unsafe.Pointer
@@ -25,8 +27,14 @@ func NewTransform[T types.Vector](size T, location T,viewportSize types.Vector2)
 	}
 }
 
-func (instance *Transform[T]) Binding(program, programIndex, transformIndex uint32) {
-	gl.UniformBlockBinding(program, programIndex, transformIndex)
+func (instance *Transform[T]) Init(program types.Program) {
+	programIndex := gl.GetUniformBlockIndex(uint32(program), gl.Str("TransformBlock\x00"))
+	gl.BindBufferBase(gl.UNIFORM_BUFFER, TransformIndex, instance.transformBuffer)
+	instance.Binding(program, programIndex,TransformIndex)
+}
+
+func (instance *Transform[T]) Binding(program types.Program, programIndex, transformIndex uint32) {
+	gl.UniformBlockBinding(uint32(program), programIndex, transformIndex)
 }
 
 func (instance *Transform[T]) GetBuffer() uint32 {

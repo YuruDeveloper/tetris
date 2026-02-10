@@ -77,7 +77,7 @@ func (instance *Mesh[T]) Delete() {
 	gl.DeleteVertexArrays(1, &instance.vertexArrayObject)
 }
 
-func (instance *Mesh[T]) Rendering() {
+func (instance *Mesh[T]) Render() {
 	gl.BindVertexArray(instance.vertexArrayObject)
 	gl.DrawElementsWithOffset(gl.TRIANGLES, instance.indicesBuffer.GetIndicesCount(), gl.UNSIGNED_INT, 0)
 }
