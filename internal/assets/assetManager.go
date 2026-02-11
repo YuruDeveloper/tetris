@@ -2,6 +2,7 @@ package asset
 
 import (
 	"sync"
+	"sync/atomic"
 
 	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
 	"github.com/YuruDeveloper/tetris/internal/ports"
@@ -10,53 +11,70 @@ import (
 )
 
 
+
+type AssetStore struct {
+	asset ports.Asset
+	referenceCount atomic.Int32
+	assetMutex sync.Mutex
+}
+
+type AssetManager struct {
+	storeList types.TypeSyncMap[uuid.UUID,*AssetStore]
+	factoryList types.TypeSyncMap[uuid.UUID,func() ports.Asset] 
+}
+
+
 var manager *AssetManager
 var managerOnce sync.Once
 
 func GetAssetManager() *AssetManager{
 	managerOnce.Do(func() {
 		manager = &AssetManager{
-			assetList: make(map[uuid.UUID]ports.Asset),
-			referenceCount: make(map[uuid.UUID]int),
-			factoryList: make(map[uuid.UUID]func() ports.Asset),
+			storeList: types.TypeSyncMap[uuid.UUID,*AssetStore] {},
+			factoryList: types.TypeSyncMap[uuid.UUID,func() ports.Asset] {},
 		}
 		manager.Init()
 	})
 	return manager
 }
 
-type AssetManager struct {
-	assetList map[uuid.UUID]ports.Asset
-	referenceCount map[uuid.UUID]int
-	factoryList map[uuid.UUID]func() ports.Asset
-	mutex sync.RWMutex
+func newAssetStore(asset ports.Asset) *AssetStore {
+	store := &AssetStore{
+		asset: asset,
+		referenceCount: atomic.Int32{},
+	}
+	store.referenceCount.Store(0)
+	return store
 }
 
-func (instance *AssetManager) get(uuid uuid.UUID) (ports.Asset,error) {
-	instance.mutex.Lock()
-	defer instance.mutex.Unlock()
- 	asset, exist := instance.assetList[uuid]
+
+func (instance *AssetManager) get(uuid uuid.UUID) (*AssetStore,error) {
+ 	store, exist := instance.storeList.Load(uuid)
 	if !exist {
-		asset = instance.createAsset(uuid)
+		asset := instance.createAsset(uuid)
 		if asset == nil {
 			return nil , packagederror.NewError(packagederror.UnknownAsset,"FailToLoadAsset")
 		}
-		instance.assetList[uuid] = asset
-		instance.referenceCount[uuid] = 0
+		newStore := newAssetStore(asset)
+		store , _ = instance.storeList.LoadOrStore(uuid,newStore)
 	}
-	if asset.IsLoaded() {
-		instance.referenceCount[uuid] += 1
-		return asset , nil
+	count := store.referenceCount.Add(1)
+	
+	if count == 1 {
+		store.assetMutex.Lock()
+		if !store.asset.IsLoaded() {
+			if err := store.asset.Load() ; err != nil {
+				store.assetMutex.Unlock()
+				return nil, err
+			}
+		}
+		store.assetMutex.Unlock()
 	}
-	if err := asset.Load() ; err != nil {
-		return nil , err
-	}
-	instance.referenceCount[uuid] += 1
-	return asset , nil
+	return store , nil
 }
 
 func (instance *AssetManager) createAsset(uuid uuid.UUID) ports.Asset {
-	create , ok := instance.factoryList[uuid]
+	create , ok := instance.factoryList.Load(uuid)
 	if !ok {
 		return nil
 	}
@@ -64,36 +82,35 @@ func (instance *AssetManager) createAsset(uuid uuid.UUID) ports.Asset {
 }
 
 func (instance *AssetManager) register(uuid uuid.UUID,createFunc func() ports.Asset) error {
-	instance.mutex.Lock()
-	defer instance.mutex.Unlock()
-	if _ , ok := instance.factoryList[uuid] ; ok {
+	if _ , ok := instance.factoryList.Load(uuid) ; ok {
 		return packagederror.NewError(packagederror.FailRegisterDuplicate,"Already registered")
 	}
-	instance.factoryList[uuid] = createFunc
+	instance.factoryList.Store(uuid,createFunc)
 	return nil
 }
 
 func (instance *AssetManager) Release(uuid uuid.UUID) {
-	instance.mutex.Lock()
-	defer instance.mutex.Unlock()
-	_ , ok := instance.referenceCount[uuid]
+	store , ok := instance.storeList.Load(uuid)
 	if !ok {
 		return
 	}
-	instance.referenceCount[uuid] -= 1
-	if instance.referenceCount[uuid] == 0 {
-		instance.assetList[uuid].UnLoad()
-		delete(instance.assetList,uuid)
-		delete(instance.referenceCount,uuid)
+	count := store.referenceCount.Add(-1)
+	if count == 0 {
+		store.assetMutex.Lock()
+		if store.referenceCount.Load() == 0 {
+			store.asset.UnLoad()	
+			instance.storeList.Delete(uuid)
+		}
+		store.assetMutex.Unlock()
 	}
 }
 
 func (instance *AssetManager) ShaderAsset(uuid uuid.UUID) (*types.Reference[types.Program], error) {
-	asset ,err := instance.get(uuid)
+	store ,err := instance.get(uuid)
 	if err != nil {
 		return nil , err
 	}
-	shader ,ok := asset.(*ShaderAsset)
+	shader ,ok := store.asset.(*ShaderAsset)
 	if !ok {
 		return nil , packagederror.NewError(packagederror.FailAssetTypeConvert,"Fail To Convert Asset Type")
 	}
@@ -101,11 +118,11 @@ func (instance *AssetManager) ShaderAsset(uuid uuid.UUID) (*types.Reference[type
 }
 
 func (instance *AssetManager) TextureAsset(uuid uuid.UUID) (*types.Reference[types.Texture], error) {
-	asset ,err := instance.get(uuid)
+	store ,err := instance.get(uuid)
 	if err != nil {
 		return nil , err
 	}
-	texture ,ok := asset.(*TextureAsset)
+	texture ,ok := store.asset.(*TextureAsset)
 	if !ok {
 		return nil , packagederror.NewError(packagederror.FailAssetTypeConvert,"Fail To Convert Asset Type")
 	}
