@@ -7,16 +7,15 @@ import (
 
 	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
 	"github.com/YuruDeveloper/tetris/internal/ports"
-	"github.com/YuruDeveloper/tetris/internal/renderer"
 	"github.com/YuruDeveloper/tetris/internal/types"
 )
 
 var _ ports.Asset = (*TextureAsset)(nil)
 
-func newTextureAsset(textureFile string) *TextureAsset {
+func NewTextureAsset(createFunction func() ports.Texture,textureFile string) *TextureAsset {
 	return &TextureAsset{
 		textureFile: textureFile,
-		texture: renderer.NewTexture(),
+		texture: createFunction(),
 		loaded: false,
 	} 
 }

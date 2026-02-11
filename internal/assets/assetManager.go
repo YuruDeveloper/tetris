@@ -33,7 +33,6 @@ func GetAssetManager() *AssetManager{
 			storeList: types.TypeSyncMap[uuid.UUID,*AssetStore] {},
 			factoryList: types.TypeSyncMap[uuid.UUID,func() ports.Asset] {},
 		}
-		manager.Init()
 	})
 	return manager
 }
@@ -64,6 +63,8 @@ func (instance *AssetManager) get(uuid uuid.UUID) (*AssetStore,error) {
 		store.assetMutex.Lock()
 		if !store.asset.IsLoaded() {
 			if err := store.asset.Load() ; err != nil {
+				store.referenceCount.Add(-1)
+				instance.storeList.Delete(uuid)
 				store.assetMutex.Unlock()
 				return nil, err
 			}
@@ -81,7 +82,7 @@ func (instance *AssetManager) createAsset(uuid uuid.UUID) ports.Asset {
 	return create()
 }
 
-func (instance *AssetManager) register(uuid uuid.UUID,createFunc func() ports.Asset) error {
+func (instance *AssetManager) Register(uuid uuid.UUID,createFunc func() ports.Asset) error {
 	if _ , ok := instance.factoryList.Load(uuid) ; ok {
 		return packagederror.NewError(packagederror.FailRegisterDuplicate,"Already registered")
 	}

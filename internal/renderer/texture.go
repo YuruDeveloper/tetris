@@ -11,7 +11,7 @@ import (
 
 var _ ports.Texture = (*Texture)(nil)
 
-func NewTexture() *Texture {
+func NewTexture() ports.Texture {
 	var texture uint32
 	gl.CreateTextures(gl.TEXTURE_2D, 1, &texture)
 	gl.TextureParameteri(texture, gl.TEXTURE_MIN_FILTER, gl.LINEAR)

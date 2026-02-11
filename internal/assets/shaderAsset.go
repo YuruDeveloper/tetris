@@ -5,7 +5,6 @@ import (
 
 	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
 	"github.com/YuruDeveloper/tetris/internal/ports"
-	"github.com/YuruDeveloper/tetris/internal/renderer"
 	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
@@ -24,11 +23,11 @@ type ShaderAsset struct {
 	shader ports.Shader
 }
 
-func newShaderAsset(vertexShaderFile string,fragmentShaderFile string) *ShaderAsset {
+func NewShaderAsset(createFunction func() ports.Shader ,vertexShaderFile string,fragmentShaderFile string) *ShaderAsset {
 	return &ShaderAsset{
 		vertexShaderFile: vertexShaderFile,
 		fragmentShaderFile: fragmentShaderFile,
-		shader: renderer.NewShaders(),
+		shader: createFunction(),
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 
 	asset "github.com/YuruDeveloper/tetris/internal/assets"
 	"github.com/YuruDeveloper/tetris/internal/keyboard"
+	"github.com/YuruDeveloper/tetris/internal/resources"
 	"github.com/YuruDeveloper/tetris/internal/renderer"
 	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/YuruDeveloper/tetris/internal/window"
@@ -13,6 +14,7 @@ import (
 
 func main() {
 	runtime.LockOSThread()
+	resource.Init()
 	window := window.NewWindow()
 	err := window.Init(480, 720, types.NewColor(255, 255, 255, 255))
 	if err != nil {
@@ -20,12 +22,12 @@ func main() {
 		return
 	}
 
-	shader, err := asset.GetAssetManager().ShaderAsset(asset.DefaultShaderID)
+	shader, err := asset.GetAssetManager().ShaderAsset(resource.DefaultShaderID)
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
-	texture, err := asset.GetAssetManager().TextureAsset(asset.DefaultTextureID)
+	texture, err := asset.GetAssetManager().TextureAsset(resource.DefaultTextureID)
 	if err != nil {
 		log.Fatalln(err)
 		return
@@ -68,6 +70,5 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	asset.GetAssetManager().Release(asset.DefaultShaderID)
-	asset.GetAssetManager().Release(asset.DefaultTextureID)
+	renderer.Delete()
 }
