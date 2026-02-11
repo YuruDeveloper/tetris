@@ -18,7 +18,6 @@ func NewRenderObject[T types.Vector](vertex []T, indices []uint32,uv []types.Vec
 		mesh:      mesh,
 		material: material,
 		transform: transform,
-		sync:      NewSync(),
 	}, nil
 }
 
@@ -26,7 +25,6 @@ type RenderObject[T types.Vector] struct {
 	mesh           *Mesh[T]
 	transform      *Transform[T]
 	material *Material
-	sync           *Sync
 }
 
 func (instance *RenderObject[T]) Init(transformIndex uint32) error {
@@ -49,15 +47,12 @@ func (instance *RenderObject[T]) SetSize(size T) {
 }
 
 func (instance *RenderObject[T]) Rendering() {
-	instance.sync.WaitSync()
 	instance.material.Render()
 	instance.mesh.Render()
-	instance.sync.NewFence()
 }
 
 func (instance *RenderObject[T]) Delete() {
 	instance.material.Delete()
 	instance.mesh.Delete()
 	instance.transform.Delete()
-	instance.sync.Delete()
 }

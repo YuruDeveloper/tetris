@@ -5,6 +5,7 @@ import (
 
 	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
 	"github.com/YuruDeveloper/tetris/internal/ports"
+	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/google/uuid"
 )
 
@@ -87,7 +88,7 @@ func (instance *AssetManager) Release(uuid uuid.UUID) {
 	}
 }
 
-func (instance *AssetManager) ShaderAsset(uuid uuid.UUID) (*ShaderAsset, error) {
+func (instance *AssetManager) ShaderAsset(uuid uuid.UUID) (*types.Reference[types.Program], error) {
 	asset ,err := instance.get(uuid)
 	if err != nil {
 		return nil , err
@@ -96,10 +97,10 @@ func (instance *AssetManager) ShaderAsset(uuid uuid.UUID) (*ShaderAsset, error) 
 	if !ok {
 		return nil , packagederror.NewError(packagederror.FailAssetTypeConvert,"Fail To Convert Asset Type")
 	}
-	return shader , nil
+	return types.NewReference(shader.Get(),func(){ instance.Release(uuid) }) , nil 
 }
 
-func (instance *AssetManager) TextureAsset(uuid uuid.UUID) (*TextureAsset, error) {
+func (instance *AssetManager) TextureAsset(uuid uuid.UUID) (*types.Reference[types.Texture], error) {
 	asset ,err := instance.get(uuid)
 	if err != nil {
 		return nil , err
@@ -108,5 +109,5 @@ func (instance *AssetManager) TextureAsset(uuid uuid.UUID) (*TextureAsset, error
 	if !ok {
 		return nil , packagederror.NewError(packagederror.FailAssetTypeConvert,"Fail To Convert Asset Type")
 	}
-	return texture , nil
+	return types.NewReference(texture.Get(),func(){ instance.Release(uuid) }) , nil 
 }

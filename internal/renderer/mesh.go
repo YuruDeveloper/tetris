@@ -73,6 +73,7 @@ func (instance *Mesh[T]) GetVertexArrayObject() uint32 {
 
 func (instance *Mesh[T]) Delete() {
 	instance.indicesBuffer.Delete()
+	instance.uvBuffer.Delete()
 	instance.vertexBuffer.Delete()
 	gl.DeleteVertexArrays(1, &instance.vertexArrayObject)
 }

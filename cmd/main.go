@@ -48,7 +48,7 @@ func main() {
 	types.NewVector2(10, 10),
 	types.NewVector2(0, 10),
 	types.NewVector2(480,720),
-	renderer.NewMeterial(shader.Get(),texture.Get()),
+	renderer.NewMeterial(shader,texture),
 	)
 	if err != nil {
 		log.Fatalln(err)

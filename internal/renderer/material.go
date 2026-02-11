@@ -6,11 +6,11 @@ import (
 )
 
 type Material struct {
-	program types.Program
-	texture types.Texture
+	program *types.Reference[types.Program]
+	texture *types.Reference[types.Texture]
 }
 
-func NewMeterial(program types.Program,texture types.Texture) *Material {
+func NewMeterial(program *types.Reference[types.Program],texture *types.Reference[types.Texture]) *Material {
 	return &Material{
 		program: program,
 		texture: texture,
@@ -18,22 +18,23 @@ func NewMeterial(program types.Program,texture types.Texture) *Material {
 }
 
 func (instance *Material) Init() {
-	gl.UseProgram(uint32(instance.program))
-	samplerLocation := gl.GetUniformLocation(uint32(instance.program),gl.Str("textureMap\x00"))
+	gl.UseProgram(uint32(instance.program.Get()))
+	samplerLocation := gl.GetUniformLocation(uint32(instance.program.Get()),gl.Str("textureMap\x00"))
     gl.Uniform1i(samplerLocation, 0)
 }
 
 func (instance *Material) GetProgram() types.Program {
-	return instance.program
+	return instance.program.Get()
 }
 
 func (instance *Material) Render() {
-	gl.UseProgram(uint32(instance.program))
+	gl.UseProgram(uint32(instance.program.Get()))
 	gl.ActiveTexture(gl.TEXTURE0)
-	gl.BindTexture(gl.TEXTURE_2D,uint32(instance.texture))
+	gl.BindTexture(gl.TEXTURE_2D,uint32(instance.texture.Get()))
 }
 
 func (instance *Material) Delete() {
-	
+	instance.program.Delete()
+	instance.texture.Delete()
 }
  

@@ -12,11 +12,13 @@ var _ ports.Renderer = (*Renderer)(nil)
 func NewRenderer() *Renderer {
 	return &Renderer{
 		datas: make(map[uuid.UUID]*RenderObject[types.Vector2]),
+		sync:      NewSync(),
 	}
 }
 
 type Renderer struct {
 	datas     map[uuid.UUID]*RenderObject[types.Vector2]
+	sync           *Sync
 	locationX float64
 }
 
@@ -25,6 +27,7 @@ func (instance *Renderer) Set(data *RenderObject[types.Vector2]) {
 }
 
 func (instance *Renderer) Rendering(deltaTime float64) {
+	instance.sync.WaitSync()
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 	for _, data := range instance.datas {
 		instance.locationX += deltaTime * 100
@@ -34,10 +37,12 @@ func (instance *Renderer) Rendering(deltaTime float64) {
 		data.SetLocation(types.NewVector2(float32(instance.locationX), 0))
 		data.Rendering()
 	}
+	instance.sync.NewFence()
 }
 
 func (instance *Renderer) Delete() {
 	for _, data := range instance.datas {
 		data.Delete()
 	}
+	instance.sync.Delete()
 }
