@@ -129,3 +129,27 @@ func (instance *AssetManager) TextureAsset(uuid uuid.UUID) (*types.Reference[typ
 	}
 	return types.NewReference(texture.Get(),func(){ instance.Release(uuid) }) , nil 
 }
+
+func (instance *AssetManager) MeshAsset2D(uuid uuid.UUID) (*types.Reference[types.Mesh], error) {
+	store ,err := instance.get(uuid)
+	if err != nil {
+		return nil , err
+	}
+	mesh ,ok := store.asset.(*MeshAsset2D)
+	if !ok {
+		return nil , packagederror.NewError(packagederror.FailAssetTypeConvert,"Fail To Convert Asset Type")
+	}
+	return types.NewReference(mesh.Get(),func(){ instance.Release(uuid) }) , nil 
+}
+
+func (instance *AssetManager) Material(uuid uuid.UUID) (*types.Handle[types.Meterial] , error) {
+	store , err := instance.get(uuid)
+	if err != nil {
+		return nil , err
+	}
+	material , ok := store.asset.(*MaterialAsset)
+	if !ok {
+		return nil , packagederror.NewError(packagederror.FailAssetTypeConvert,"Fail To Convert Asset Type")
+	}
+	return types.NewHandle(material.Get(),func() { instance.Release(uuid) },material.GetRenderer()) , nil
+}

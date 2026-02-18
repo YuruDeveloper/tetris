@@ -6,7 +6,7 @@ type IndicesBuffer struct {
 }
 
 func NewIndicesBuffer(indices []uint32) (*IndicesBuffer, error) {
-	buffer, err := NewBuffer(indices)
+	buffer, err := NewBufferWithDatas(indices,0)
 	if err != nil {
 		return nil , err
 	}

@@ -17,31 +17,48 @@ type Shader struct {
 	program uint32
 }
 
-func (instance *Shader) CompileShader(vertexShaderSource **uint8,vertexShaderSourceLength int32,fragmentShaderSource **uint8,fragmentShaderSourceLength int32) error {
+func (instance *Shader) CompileShader(vertexShaderString string,fragmentShaderString string) error {
 	if instance.program != 0 && gl.IsProgram(instance.program) {
 		return packagederror.NewError(packagederror.AlreadyCompiled, "Already Compiled")
 	}
+
+	vertexShaderSourceLength := int32(len(vertexShaderString))
+	fragmentShaderSourceLength := int32(len(fragmentShaderString))
+	vertexShaderSource , freeVertexShaderSource := gl.Strs(vertexShaderString)
+	fragmentShaderSource , freeFragmentShaderSource:= gl.Strs(fragmentShaderString)
+
 	vertexShader := gl.CreateShader(gl.VERTEX_SHADER)
 	gl.ShaderSource(vertexShader, 1, vertexShaderSource, &vertexShaderSourceLength)
 	gl.CompileShader(vertexShader)
 	err := instance.checkShaderStatus(vertexShader)
 	if err != nil {
+		freeVertexShaderSource()
+		freeFragmentShaderSource()
 		return err
 	}
+
 	fragmentShader := gl.CreateShader(gl.FRAGMENT_SHADER)
 	gl.ShaderSource(fragmentShader, 1, fragmentShaderSource, &fragmentShaderSourceLength)
 	gl.CompileShader(fragmentShader)
 	err = instance.checkShaderStatus(fragmentShader)
 	if err != nil {
+		freeVertexShaderSource()
+		freeFragmentShaderSource()
 		return err
 	}
+
 	instance.program = gl.CreateProgram()
 	gl.AttachShader(instance.program, vertexShader)
 	gl.AttachShader(instance.program, fragmentShader)
 	gl.LinkProgram(instance.program)
+	
 	gl.DeleteShader(vertexShader)
 	gl.DeleteShader(fragmentShader)
+	freeVertexShaderSource()
+	freeFragmentShaderSource()
+	
 	err = instance.checkProgramStatus(instance.program)
+	
 	return err
 }
 

@@ -8,6 +8,10 @@ import (
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
+const VertexBufferObjectIndex = uint32(0)
+const UVBufferIndex = uint32(1)
+const FloatDataSize = int(unsafe.Sizeof(float32(0)))
+
 type Mesh[T types.Vector] struct {
 	vertexBuffer      *Buffer[T]
 	indicesBuffer     *IndicesBuffer
@@ -16,7 +20,7 @@ type Mesh[T types.Vector] struct {
 }
 
 func NewMesh[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2) (*Mesh[T], error) {
-	vertexBuffer, err := NewBuffer(vertex)
+	vertexBuffer, err := NewBufferWithDatas(vertex,0)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +29,7 @@ func NewMesh[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2) (*
 		vertexBuffer.Delete()
 		return nil, err
 	}
-	uvBuffer , err := NewBuffer(uv)
+	uvBuffer , err := NewBufferWithDatas(uv,0)
 	if err != nil {
 		vertexBuffer.Delete()
 		indicesBuffer.Delete()
@@ -67,8 +71,11 @@ func (instance *Mesh[T]) Init() error {
 	return nil
 }
 
-func (instance *Mesh[T]) GetVertexArrayObject() uint32 {
-	return instance.vertexArrayObject
+func (instance *Mesh[T]) GetMesh() types.Mesh {
+	return types.Mesh {
+		VertexArrayObject: types.VertexArrayObject(instance.vertexArrayObject),
+		IndciesCount: instance.indicesBuffer.GetIndicesCount(),
+	}
 }
 
 func (instance *Mesh[T]) Delete() {
@@ -76,9 +83,4 @@ func (instance *Mesh[T]) Delete() {
 	instance.uvBuffer.Delete()
 	instance.vertexBuffer.Delete()
 	gl.DeleteVertexArrays(1, &instance.vertexArrayObject)
-}
-
-func (instance *Mesh[T]) Render() {
-	gl.BindVertexArray(instance.vertexArrayObject)
-	gl.DrawElementsWithOffset(gl.TRIANGLES, instance.indicesBuffer.GetIndicesCount(), gl.UNSIGNED_INT, 0)
 }

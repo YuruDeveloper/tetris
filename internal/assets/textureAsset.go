@@ -23,7 +23,6 @@ func NewTextureAsset(createFunction func() ports.Texture,textureFile string) *Te
 type TextureAsset struct {
 	textureFile string
 	texture ports.Texture
-	level int32
 	loaded bool
 }
 
@@ -59,7 +58,7 @@ func (instance *TextureAsset) init() error {
 	if !ok {
 		return packagederror.NewError(packagederror.FailConvertImage, "FailToConvertImage")
 	}
-	instance.texture.LoadTextureImage(rgba,width,height,instance.level)
+	instance.texture.LoadTextureImage(types.ImageInformation{ Image: rgba, Width: width, Height: height })
 	instance.loaded = true
 	return nil
 }

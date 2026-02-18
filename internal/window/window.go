@@ -6,6 +6,7 @@ import (
 	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
+	"github.com/google/uuid"
 )
 
 const TargetFPS = 144.0
@@ -17,10 +18,10 @@ func NewWindow() *Window {
 
 type Window struct {
 	window     *glfw.Window
-	background types.Color
+	renderer ports.Renderer
 }
 
-func (instance *Window) Init(width int, height int, color types.Color) error {
+func (instance *Window) Init(width int, height int, color types.Color,renderer ports.Renderer) error {
 	if err := glfw.Init(); err != nil {
 		glfw.Terminate()
 		return packagederror.NewError(packagederror.FailGLFWInitError, err.Error())
@@ -35,36 +36,35 @@ func (instance *Window) Init(width int, height int, color types.Color) error {
 		return packagederror.NewError(packagederror.FailCreateWindow, err.Error())
 	}
 	instance.window = window
-	instance.background = color
 	instance.window.MakeContextCurrent()
 	if err := gl.Init(); err != nil {
 		glfw.Terminate()
 		return packagederror.NewError(packagederror.FailGLInitError, err.Error())
 	}
+	instance.renderer = renderer
 	glfw.SwapInterval(0)
+	floatColor := color.GetColor()
+	gl.ClearColor(floatColor.Red, floatColor.Green, floatColor.Blue, floatColor.Alpha)
+	
 	return nil
 }
 
-func (instance *Window) Update(renderer ports.Renderer) error {
-	floatColor := instance.background.GetColor()
-	gl.ClearColor(floatColor.Red, floatColor.Green, floatColor.Blue, floatColor.Alpha)
-	var currentTime float64
-	var lastTime float64
-	var deltaTime float64
-	lastTime = glfw.GetTime()
-	for !instance.window.ShouldClose() {
-		currentTime = glfw.GetTime()
-		deltaTime = currentTime - lastTime
-		if deltaTime > TargetDeltaTime {
-			lastTime = currentTime
-			renderer.Rendering(deltaTime)
-			instance.window.SwapBuffers()
-			glfw.PollEvents()
-		}
-	}
+func (instance *Window) NewObject(mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],location,size types.Vector2) uuid.UUID {
+	return instance.renderer.NewObject(mesh,material,location,size)
+}
 
-	glfw.Terminate()
-	return nil
+func (instance *Window) SetLocation(uuid uuid.UUID,location types.Vector2) {
+	instance.renderer.SetLocation(uuid,location)
+}
+
+func (instance *Window) SetSize(uuid uuid.UUID,size types.Vector2) {
+	instance.renderer.SetSize(uuid,size)
+}
+
+func (instance *Window) Update(deltaTime float64) {
+	instance.renderer.Rendering(deltaTime)
+	instance.window.SwapBuffers()
+	glfw.PollEvents()
 }
 
 func (instance *Window) Close() {
@@ -72,6 +72,7 @@ func (instance *Window) Close() {
 		return
 	}
 	instance.window.SetShouldClose(true)
+	glfw.Terminate()
 }
 
 func (instance *Window) SetKeyCallBack(callback glfw.KeyCallback) {

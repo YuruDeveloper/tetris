@@ -10,7 +10,7 @@ type Material struct {
 	texture *types.Reference[types.Texture]
 }
 
-func NewMeterial(program *types.Reference[types.Program],texture *types.Reference[types.Texture]) *Material {
+func NewMaterial(program *types.Reference[types.Program],texture *types.Reference[types.Texture]) *Material {
 	return &Material{
 		program: program,
 		texture: texture,
@@ -18,19 +18,20 @@ func NewMeterial(program *types.Reference[types.Program],texture *types.Referenc
 }
 
 func (instance *Material) Init() {
-	gl.UseProgram(uint32(instance.program.Get()))
-	samplerLocation := gl.GetUniformLocation(uint32(instance.program.Get()),gl.Str("textureMap\x00"))
+	program := instance.program.Get()
+	gl.UseProgram(uint32(program))
+	samplerLocation := gl.GetUniformLocation(uint32(program),gl.Str("textureMap\x00"))
     gl.Uniform1i(samplerLocation, 0)
+	return 
 }
 
-func (instance *Material) GetProgram() types.Program {
-	return instance.program.Get()
-}
-
-func (instance *Material) Render() {
-	gl.UseProgram(uint32(instance.program.Get()))
-	gl.ActiveTexture(gl.TEXTURE0)
-	gl.BindTexture(gl.TEXTURE_2D,uint32(instance.texture.Get()))
+func (instance *Material) GetMeterial() types.Meterial {
+	program  := instance.program.Get()
+	texture:= instance.texture.Get()
+	return types.Meterial{
+		Program: program,	
+		Texture: texture,
+	}
 }
 
 func (instance *Material) Delete() {

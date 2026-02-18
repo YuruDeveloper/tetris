@@ -18,11 +18,11 @@ func must(err error) {
 	}
 }
 
-func Init() {
-	must(asset.GetAssetManager().Register(DefaultShaderID,func() ports.Asset {
+func Init(manager ports.Manager) {
+	must(manager.Register(DefaultShaderID,func() ports.Asset {
 		return asset.NewShaderAsset(renderer.NewShaders,"./public/vertexShader.vs","./public/fragmentShader.fs")
 	}))
-	must(asset.GetAssetManager().Register(DefaultTextureID,func() ports.Asset {
+	must(manager.Register(DefaultTextureID,func() ports.Asset {
 		return  asset.NewTextureAsset(renderer.NewTexture,"./public/texture.png")
 	}))
 }

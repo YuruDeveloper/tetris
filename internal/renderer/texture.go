@@ -1,9 +1,8 @@
 package renderer
 
 import (
-	"image"
 	"unsafe"
-
+	
 	"github.com/YuruDeveloper/tetris/internal/ports"
 	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
@@ -27,9 +26,9 @@ type Texture struct {
 	texture uint32
 }
 
-func (instance *Texture) LoadTextureImage(image *image.NRGBA, width,height,level int32) {
-	gl.TextureStorage2D(instance.texture, 1, gl.RGBA8, width, height)
-	gl.TextureSubImage2D(instance.texture, level, 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, unsafe.Pointer(&image.Pix[0]))
+func (instance *Texture) LoadTextureImage(information types.ImageInformation) {
+	gl.TextureStorage2D(instance.texture, 1, gl.RGBA8, information.Width, information.Height)
+	gl.TextureSubImage2D(instance.texture, 0, 0, 0, information.Width, information.Height, gl.RGBA, gl.UNSIGNED_BYTE, unsafe.Pointer(&information.Image.Pix[0]))
 	
 }
 

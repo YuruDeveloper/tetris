@@ -12,12 +12,8 @@ import (
 var _ ports.Asset = (*ShaderAsset)(nil)
 
 type ShaderAsset struct {
-	vertexShaderSource         **uint8
-	freeVertexShaderSource     func()
-	vertexShaderSourceLength   int32
-	fragmentShaderSource       **uint8
-	freeFragmentShaderSource   func()
-	fragmentShaderSourceLength int32
+	vertexShaderString string
+	fragmentShaderString string
 	vertexShaderFile string
 	fragmentShaderFile string
 	shader ports.Shader
@@ -56,14 +52,12 @@ func (instance *ShaderAsset) loadFiles() error {
 	if err != nil {
 		return packagederror.NewError(packagederror.FailReadFile, err.Error())
 	}
-	instance.vertexShaderSource, instance.freeVertexShaderSource = gl.Strs(string(data))
-	instance.vertexShaderSourceLength = int32(len(string(data)))
+	instance.vertexShaderString = string(data)
 	data, err = os.ReadFile(instance.fragmentShaderFile)
 	if err != nil {
 		return packagederror.NewError(packagederror.FailReadFile, err.Error())
 	}
-	instance.fragmentShaderSource, instance.freeFragmentShaderSource = gl.Strs(string(data))
-	instance.fragmentShaderSourceLength = int32(len(string(data)))
+	instance.fragmentShaderString = string(data)
 	return nil
 }
 
@@ -71,12 +65,10 @@ func (instance *ShaderAsset) init() error {
 	if instance.shader.GetProgram() != 0 && gl.IsProgram(uint32(instance.shader.GetProgram())) {
 		return packagederror.NewError(packagederror.AlreadyCompiled, "Already Compiled")
 	}
-	err := instance.shader.CompileShader(instance.vertexShaderSource,instance.vertexShaderSourceLength,instance.fragmentShaderSource,instance.fragmentShaderSourceLength)
+	err := instance.shader.CompileShader(instance.vertexShaderString,instance.fragmentShaderString)
 	if err != nil {
 		return err
 	}
-	instance.freeVertexShaderSource()
-	instance.freeFragmentShaderSource()
 	return nil
 }
 

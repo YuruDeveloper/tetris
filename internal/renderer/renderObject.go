@@ -1,58 +1,43 @@
 package renderer
 
 import (
-	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
+	"unsafe"
+
 	"github.com/YuruDeveloper/tetris/internal/types"
+	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
-func NewRenderObject[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2, size T, location T,viewportSize types.Vector2,material *Material) (*RenderObject[T], error) {
-	if len(vertex) == 0 || len(indices) == 0  {
-		return nil, packagederror.NewError(packagederror.FailCreateRenderingData, "Something is empty or nil")
-	}
-	mesh, err := NewMesh(vertex, indices,uv)
-	if err != nil {
-		return nil, err
-	}
-	transform := NewTransform(size, location,viewportSize)
-	return &RenderObject[T]{
+func NewRenderObject(id uint32,mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],world *World,tranfrom2D *Transform2D) *RenderObject {
+	return &RenderObject{
+		id : id,
+		world: world,
 		mesh:      mesh,
 		material: material,
-		transform: transform,
-	}, nil
-}
-
-type RenderObject[T types.Vector] struct {
-	mesh           *Mesh[T]
-	transform      *Transform[T]
-	material *Material
-}
-
-func (instance *RenderObject[T]) Init(transformIndex uint32) error {
-	instance.material.Init()
-	err := instance.mesh.Init()
-	if err != nil {
-		instance.Delete()
-		return err
 	}
-	instance.transform.Init(instance.material.GetProgram()) 
-	return nil
 }
 
-func (instance *RenderObject[T]) SetLocation(location T) {
-	instance.transform.SetLocation(location)
+type RenderObject struct {
+	id uint32
+	transform *Transform2D
+	world *World
+	mesh     *types.Reference[types.Mesh]
+	material *types.Handle[types.Meterial]
 }
 
-func (instance *RenderObject[T]) SetSize(size T) {
-	instance.transform.SetSize(size)
+func (instance *RenderObject) Init(transformIndex uint32)  {
+	material  := instance.material.Get() 
+	instance.world.Init(material.Program)
 }
 
-func (instance *RenderObject[T]) Rendering() {
+func (instance *RenderObject) Rendering() {
+	mesh := instance.mesh.Get()  	
 	instance.material.Render()
-	instance.mesh.Render()
+	instance.transform.Bind(instance.material.Get().Program)
+	gl.BindVertexArray(uint32(mesh.VertexArrayObject))
+	gl.DrawElementsInstancedBaseInstance(gl.TRIANGLES,mesh.IndciesCount,gl.UNSIGNED_INT,unsafe.Pointer(nil),1,instance.id)
 }
 
-func (instance *RenderObject[T]) Delete() {
+func (instance *RenderObject) Delete() {
 	instance.material.Delete()
 	instance.mesh.Delete()
-	instance.transform.Delete()
 }

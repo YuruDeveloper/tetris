@@ -24,6 +24,7 @@ const (
 	DataArrayIsEmpty        = 401
 	FailCreateRenderingData = 402
 	UnSupportedDataType     = 403
+	AlreadyDeleted = 404
 
 	UnknownAsset = 500
 	FailAssetTypeConvert = 501
