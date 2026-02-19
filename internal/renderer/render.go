@@ -14,14 +14,14 @@ func NewRenderer() *Renderer {
 		objects: make([]map[uuid.UUID]*RenderObject, 0),
 		idList: make(map[uuid.UUID]int),
 		sync:      NewSync(),	
-		idCount: 0,
+		idManager: NewIDManager(),
 	}
 }
 
 type Renderer struct {
 	objects []map[uuid.UUID]*RenderObject
 	idList map[uuid.UUID]int
-	idCount int
+	idManager *IDManager
 	transform *Transform2D
 	sync           *Sync
 	world *World
@@ -38,10 +38,10 @@ func (instance *Renderer) NewObject(order int,mesh *types.Reference[types.Mesh],
 		instance.objects = append(instance.objects,make(map[uuid.UUID]*RenderObject))
 	}
 	uuid := uuid.New()
-	instance.idList[uuid] = instance.idCount
-	instance.transform.NewTransform(instance.idCount,types.PackedTransform[types.Vector2]{ Size: size,Location : location })
-	instance.objects[order][uuid] = NewRenderObject(uint32(instance.idCount),mesh,material,instance.world,instance.transform)
-	instance.idCount++
+	id := instance.idManager.Get()
+	instance.idList[uuid] = id
+	instance.transform.NewTransform(id,types.PackedTransform[types.Vector2]{ Size: size,Location : location })
+	instance.objects[order][uuid] = NewRenderObject(uint32(id),mesh,material,instance.world,instance.transform)
 	return uuid
 }
 
@@ -49,6 +49,7 @@ func (instance *Renderer) DeleteObject(uuid uuid.UUID) {
 	for _ , objectMap := range instance.objects {
 		if object , ok := objectMap[uuid] ; ok {
 			object.Delete()
+			instance.idManager.Delete(instance.idList[uuid])
 			delete(instance.idList,uuid)
 			delete(objectMap,uuid)
 		}
