@@ -20,7 +20,7 @@ type AssetStore struct {
 }
 
 type AssetManager struct {
-	storeList map[uuid.UUID]*AssetStore //types.TypeSyncMap[uuid.UUID,*AssetStore]
+	storeList map[uuid.UUID]*AssetStore 
 	ListMutex sync.RWMutex
 	factoryList types.TypeSyncMap[uuid.UUID,func() ports.Asset] 
 }
@@ -32,7 +32,7 @@ var managerOnce sync.Once
 func GetAssetManager() *AssetManager{
 	managerOnce.Do(func() {
 		manager = &AssetManager{
-			storeList: make(map[uuid.UUID]*AssetStore), //types.TypeSyncMap[uuid.UUID,*AssetStore] {},
+			storeList: make(map[uuid.UUID]*AssetStore), 
 			factoryList: types.TypeSyncMap[uuid.UUID,func() ports.Asset] {},
 		}
 	})
