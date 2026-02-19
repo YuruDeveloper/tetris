@@ -52,6 +52,10 @@ func (instance *Window) NewObject(order int,mesh *types.Reference[types.Mesh],ma
 	return instance.renderer.NewObject(order,mesh,material,location,size)
 }
 
+func (instance *Window) DeleteObject(uuid uuid.UUID) {
+	instance.renderer.DeleteObject(uuid)
+}
+
 func (instance *Window) SetLocation(uuid uuid.UUID,location types.Vector2) {
 	instance.renderer.SetLocation(uuid,location)
 }

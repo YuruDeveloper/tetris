@@ -11,15 +11,17 @@ var _ ports.Renderer = (*Renderer)(nil)
 
 func NewRenderer() *Renderer {
 	return &Renderer{
-		objects: make([][]*RenderObject, 0),
+		objects: make([]map[uuid.UUID]*RenderObject, 0),
 		idList: make(map[uuid.UUID]int),
 		sync:      NewSync(),	
+		idCount: 0,
 	}
 }
 
 type Renderer struct {
-	objects [][]*RenderObject
+	objects []map[uuid.UUID]*RenderObject
 	idList map[uuid.UUID]int
+	idCount int
 	transform *Transform2D
 	sync           *Sync
 	world *World
@@ -33,17 +35,24 @@ func (instance *Renderer) Init(viewport types.Vector2) {
 
 func (instance *Renderer) NewObject(order int,mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],location,size types.Vector2) uuid.UUID {
 	for order >= len(instance.objects) {
-		instance.objects = append(instance.objects, make([]*RenderObject,0))
+		instance.objects = append(instance.objects,make(map[uuid.UUID]*RenderObject))
 	}
 	uuid := uuid.New()
-	id := 0
-	for _ , slice := range instance.objects {
-		id += len(slice) 
-	}
-	instance.idList[uuid] = id
-	instance.transform.NewTransform(id,types.PackedTransform[types.Vector2]{ Size: size,Location : location })
-	instance.objects[order] = append(instance.objects[order], NewRenderObject(uint32(id),mesh,material,instance.world,instance.transform) )
+	instance.idList[uuid] = instance.idCount
+	instance.transform.NewTransform(instance.idCount,types.PackedTransform[types.Vector2]{ Size: size,Location : location })
+	instance.objects[order][uuid] = NewRenderObject(uint32(instance.idCount),mesh,material,instance.world,instance.transform)
+	instance.idCount++
 	return uuid
+}
+
+func (instance *Renderer) DeleteObject(uuid uuid.UUID) {
+	for _ , objectMap := range instance.objects {
+		if object , ok := objectMap[uuid] ; ok {
+			object.Delete()
+			delete(instance.idList,uuid)
+			delete(objectMap,uuid)
+		}
+	}
 }
 
 func (instance *Renderer) SetSize(uuid uuid.UUID,size types.Vector2) {
@@ -57,8 +66,8 @@ func (instance *Renderer) SetLocation(uuid uuid.UUID,location types.Vector2) {
 func (instance *Renderer) Rendering(deltaTime float64) {
 	instance.sync.WaitSync()
 	gl.Clear(gl.COLOR_BUFFER_BIT)
-	for _ , slice := range instance.objects {
-		for _ , object := range slice {
+	for _ , objectMap := range instance.objects {
+		for _ , object := range objectMap {
 			object.Rendering()
 		}
 	}
@@ -66,8 +75,8 @@ func (instance *Renderer) Rendering(deltaTime float64) {
 }
 
 func (instance *Renderer) Delete() {
-	for _ , slice := range instance.objects {
-		for _ , object := range slice {
+	for _ , objectMap := range instance.objects {
+		for _ , object := range objectMap {
 			object.Delete()
 		}
 	}
