@@ -142,7 +142,7 @@ func (instance *AssetManager) MeshAsset2D(uuid uuid.UUID) (*types.Reference[type
 	return types.NewReference(mesh.Get(),func(){ instance.Release(uuid) }) , nil 
 }
 
-func (instance *AssetManager) Material(uuid uuid.UUID) (*types.Handle[types.Meterial] , error) {
+func (instance *AssetManager) Material(uuid uuid.UUID) (*types.Handle[types.Material] , error) {
 	store , err := instance.get(uuid)
 	if err != nil {
 		return nil , err

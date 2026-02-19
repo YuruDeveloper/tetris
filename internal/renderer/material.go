@@ -29,10 +29,10 @@ func (instance *Material) Init() {
 	instance.colorLocation = gl.GetUniformLocation(uint32(program),gl.Str("colorTint\x00"))
 }
 
-func (instance *Material) GetMeterial() types.Meterial {
+func (instance *Material) GetMaterial() types.Material {
 	program  := instance.program.Get()
 	texture:= instance.texture.Get()
-	return types.Meterial{
+	return types.Material{
 		Program: program,	
 		Texture: texture,
 		Color: instance.color.GetColor(),

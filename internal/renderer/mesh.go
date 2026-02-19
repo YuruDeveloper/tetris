@@ -74,7 +74,7 @@ func (instance *Mesh[T]) Init() error {
 func (instance *Mesh[T]) GetMesh() types.Mesh {
 	return types.Mesh {
 		VertexArrayObject: types.VertexArrayObject(instance.vertexArrayObject),
-		IndciesCount: instance.indicesBuffer.GetIndicesCount(),
+		IndicesCount: instance.indicesBuffer.GetIndicesCount(),
 	}
 }
 

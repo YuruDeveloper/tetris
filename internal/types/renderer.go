@@ -5,7 +5,7 @@ import (
 )
 
 type BufferData interface {
-	Vector2 | uint32 |  PackedWorldTrasnform | PackedTransform[Vector2] 
+	Vector2 | uint32 |  PackedWorldTransform | PackedTransform[Vector2]
 }
 
 type Vector interface {
@@ -25,7 +25,7 @@ type PackedTransform[T Vector] struct {
 	Location T
 }
 
-type PackedWorldTrasnform struct {
+type PackedWorldTransform struct {
 	ViewportSize Vector2
 }
 
@@ -37,10 +37,10 @@ type ImageInformation struct {
 
 type Mesh struct {
 	VertexArrayObject VertexArrayObject
-	IndciesCount int32
+	IndicesCount int32
 }
 
-type Meterial struct {
+type Material struct {
 	Program Program
 	Texture Texture
 	Color ColorFloat

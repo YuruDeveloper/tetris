@@ -7,7 +7,7 @@ import (
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
-func NewRenderObject(id uint32,mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],world *World,tranfrom *Transform2D) *RenderObject {
+func NewRenderObject(id uint32,mesh *types.Reference[types.Mesh],material *types.Handle[types.Material],world *World,tranfrom *Transform2D) *RenderObject {
 	return &RenderObject{
 		id : id,
 		world: world,
@@ -22,7 +22,7 @@ type RenderObject struct {
 	transform *Transform2D
 	world *World
 	mesh     *types.Reference[types.Mesh]
-	material *types.Handle[types.Meterial]
+	material *types.Handle[types.Material]
 }
 
 func (instance *RenderObject) Rendering() {
@@ -32,7 +32,7 @@ func (instance *RenderObject) Rendering() {
 	instance.world.Bind(program)
 	instance.transform.Bind(program)
 	gl.BindVertexArray(uint32(mesh.VertexArrayObject))
-	gl.DrawElementsInstancedBaseInstance(gl.TRIANGLES, mesh.IndciesCount, gl.UNSIGNED_INT, unsafe.Pointer(nil), 1, instance.id)
+	gl.DrawElementsInstancedBaseInstance(gl.TRIANGLES, mesh.IndicesCount, gl.UNSIGNED_INT, unsafe.Pointer(nil), 1, instance.id)
 }
 
 func (instance *RenderObject) Delete() {

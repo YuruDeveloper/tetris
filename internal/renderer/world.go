@@ -10,14 +10,14 @@ import (
 const WorldIndex = uint32(0)
 
 type World struct {
-	buffer *Buffer[types.PackedWorldTrasnform]
+	buffer *Buffer[types.PackedWorldTransform]
 	world unsafe.Pointer
 }
 
 func NewWorldTransform(viewportSize types.Vector2) *World {
-	var zero types.PackedWorldTrasnform
+	var zero types.PackedWorldTransform
 	flags := gl.MAP_WRITE_BIT | gl.MAP_PERSISTENT_BIT | gl.MAP_COHERENT_BIT
-	buffer := NewBufferWithData(types.PackedWorldTrasnform { ViewportSize: viewportSize },uint32(flags))
+	buffer := NewBufferWithData(types.PackedWorldTransform { ViewportSize: viewportSize },uint32(flags))
 	world := gl.MapNamedBufferRange(buffer.GetDataBuffer(),0,int(unsafe.Sizeof(zero)),uint32(flags))
 	return &World{
 		buffer: buffer,
@@ -35,7 +35,7 @@ func (instance *World) Bind(program types.Program) {
 }
 
 func (instance *World) SetViewportSize(size types.Vector2) {
-	worldPointer  := (*types.PackedWorldTrasnform)(instance.world)
+	worldPointer  := (*types.PackedWorldTransform)(instance.world)
 	worldPointer.ViewportSize = size
 }
 

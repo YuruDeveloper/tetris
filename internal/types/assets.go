@@ -1,7 +1,7 @@
 package types
 
 type AssetData interface {
-	Texture | Program | Mesh | Meterial
+	Texture | Program | Mesh | Material
 }
 
 

@@ -32,7 +32,7 @@ func NewTransform() *Transform2D {
 }
 
 func (instance *Transform2D) Bind(program types.Program) {
-	index := gl.GetProgramResourceIndex(uint32(program),gl.SHADER_STORAGE_BLOCK,gl.Str("TranformBlock\x00"))
+	index := gl.GetProgramResourceIndex(uint32(program),gl.SHADER_STORAGE_BLOCK,gl.Str("TransformBlock\x00"))
 	gl.ShaderStorageBlockBinding(uint32(program),index,TransformIndex)
 }
 

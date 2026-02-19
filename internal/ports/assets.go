@@ -17,5 +17,5 @@ type Manager interface {
 	ShaderAsset(uuid uuid.UUID) (*types.Reference[types.Program], error)
 	TextureAsset(uuid uuid.UUID) (*types.Reference[types.Texture], error)
 	MeshAsset2D(uuid uuid.UUID) (*types.Reference[types.Mesh], error)
-	Material(uuid uuid.UUID) (*types.Handle[types.Meterial] , error)
+	Material(uuid uuid.UUID) (*types.Handle[types.Material] , error)
 }

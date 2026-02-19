@@ -35,13 +35,13 @@ func (instance *MaterialAsset) UnLoad() {
 	instance.material.Delete()
 }
 
-func (instance *MaterialAsset) Get() types.Meterial {
-	return instance.material.GetMeterial()
+func (instance *MaterialAsset) Get() types.Material {
+	return instance.material.GetMaterial()
 }
 
 
-func (instance *MaterialAsset) GetRenderer() func(types.Meterial) {
-	return func(meterial types.Meterial) {
+func (instance *MaterialAsset) GetRenderer() func(types.Material) {
+	return func(meterial types.Material) {
 		gl.UseProgram(uint32(meterial.Program))
 		gl.Uniform4f(meterial.ColorLocation,meterial.Color.Red,meterial.Color.Green,meterial.Color.Blue,meterial.Color.Alpha)
 		gl.ActiveTexture(gl.TEXTURE0)

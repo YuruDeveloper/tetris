@@ -33,7 +33,7 @@ func (instance *Renderer) Init(viewport types.Vector2) {
 	instance.transform = NewTransform()
 }
 
-func (instance *Renderer) NewObject(order int,mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],location,size types.Vector2) uuid.UUID {
+func (instance *Renderer) NewObject(order int,mesh *types.Reference[types.Mesh],material *types.Handle[types.Material],location,size types.Vector2) uuid.UUID {
 	for order >= len(instance.objects) {
 		instance.objects = append(instance.objects,make(map[uuid.UUID]*RenderObject))
 	}

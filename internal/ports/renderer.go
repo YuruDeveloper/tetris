@@ -8,7 +8,7 @@ import (
 type Renderer interface {
 	Init(viewport types.Vector2)
 	Rendering(deltaTime float64)
-	NewObject(order int,mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],location,size types.Vector2) uuid.UUID
+	NewObject(order int,mesh *types.Reference[types.Mesh],material *types.Handle[types.Material],location,size types.Vector2) uuid.UUID
 	DeleteObject(uuid uuid.UUID)
 	SetSize(uuid uuid.UUID,size types.Vector2)
 	SetLocation(uuid uuid.UUID,location types.Vector2)
@@ -28,7 +28,7 @@ type Texture interface {
 
 type Material interface {
 	Init() 
-	GetMeterial() types.Meterial
+	GetMaterial() types.Material
 	Delete()
 }
 
