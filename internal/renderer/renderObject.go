@@ -7,10 +7,11 @@ import (
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
-func NewRenderObject(id uint32,mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],world *World,tranfrom2D *Transform2D) *RenderObject {
+func NewRenderObject(id uint32,mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],world *World,tranfrom *Transform2D) *RenderObject {
 	return &RenderObject{
 		id : id,
 		world: world,
+		transform: tranfrom,
 		mesh:      mesh,
 		material: material,
 	}
@@ -24,17 +25,18 @@ type RenderObject struct {
 	material *types.Handle[types.Meterial]
 }
 
-func (instance *RenderObject) Init(transformIndex uint32)  {
+func (instance *RenderObject) Init()  {
 	material  := instance.material.Get() 
 	instance.world.Init(material.Program)
 }
 
 func (instance *RenderObject) Rendering() {
-	mesh := instance.mesh.Get()  	
+	mesh := instance.mesh.Get()
+	mat := instance.material.Get()
 	instance.material.Render()
-	instance.transform.Bind(instance.material.Get().Program)
+	instance.transform.Bind(mat.Program)
 	gl.BindVertexArray(uint32(mesh.VertexArrayObject))
-	gl.DrawElementsInstancedBaseInstance(gl.TRIANGLES,mesh.IndciesCount,gl.UNSIGNED_INT,unsafe.Pointer(nil),1,instance.id)
+	gl.DrawElementsInstancedBaseInstance(gl.TRIANGLES, mesh.IndciesCount, gl.UNSIGNED_INT, unsafe.Pointer(nil), 1, instance.id)
 }
 
 func (instance *RenderObject) Delete() {

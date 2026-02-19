@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"github.com/YuruDeveloper/tetris/internal/ports"
 	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
@@ -10,7 +11,7 @@ type Material struct {
 	texture *types.Reference[types.Texture]
 }
 
-func NewMaterial(program *types.Reference[types.Program],texture *types.Reference[types.Texture]) *Material {
+func NewMaterial(program *types.Reference[types.Program],texture *types.Reference[types.Texture]) ports.Material {
 	return &Material{
 		program: program,
 		texture: texture,
@@ -21,8 +22,7 @@ func (instance *Material) Init() {
 	program := instance.program.Get()
 	gl.UseProgram(uint32(program))
 	samplerLocation := gl.GetUniformLocation(uint32(program),gl.Str("textureMap\x00"))
-    gl.Uniform1i(samplerLocation, 0)
-	return 
+    gl.Uniform1i(samplerLocation, 0) 
 }
 
 func (instance *Material) GetMeterial() types.Meterial {

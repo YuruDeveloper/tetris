@@ -32,7 +32,7 @@ func NewTransform() *Transform2D {
 }
 
 func (instance *Transform2D) Bind(program types.Program) {
-	gl.ShaderStorageBlockBinding(uint32(program),TransformIndex,TransformIndex)
+	gl.ShaderStorageBlockBinding(uint32(program),0,TransformIndex)
 }
 
 func (instance *Transform2D) resize() {
@@ -77,7 +77,6 @@ func (instance *Transform2D) Delete() {
 	gl.UnmapNamedBuffer(instance.buffer.GetDataBuffer())
 	instance.buffer.Delete()
 }
-
 
 
 

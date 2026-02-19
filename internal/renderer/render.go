@@ -36,6 +36,7 @@ func (instance *Renderer) NewObject(mesh *types.Reference[types.Mesh],material *
 	instance.idList[uuid] = id
 	instance.transform.NewTransform(id,types.PackedTransform[types.Vector2]{ Size: size,Location : location })
 	instance.datas[uuid] = NewRenderObject(uint32(id),mesh,material,instance.world,instance.transform)
+	instance.datas[uuid].Init()
 	return uuid
 }
 

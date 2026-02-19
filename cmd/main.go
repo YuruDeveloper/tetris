@@ -6,69 +6,55 @@ import (
 
 	asset "github.com/YuruDeveloper/tetris/internal/assets"
 	"github.com/YuruDeveloper/tetris/internal/keyboard"
-	"github.com/YuruDeveloper/tetris/internal/resources"
 	"github.com/YuruDeveloper/tetris/internal/renderer"
+	"github.com/YuruDeveloper/tetris/internal/resources"
 	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/YuruDeveloper/tetris/internal/window"
+	"github.com/go-gl/glfw/v3.3/glfw"
 )
+
+const TargetFPS = float64(144)
+const TargetDeltaTime = 1.0 / TargetFPS
 
 func main() {
 	runtime.LockOSThread()
-	resource.Init()
+	manager := asset.GetAssetManager()
+	resource.Init(manager)
 	window := window.NewWindow()
-	err := window.Init(480, 720, types.NewColor(255, 255, 255, 255))
-	if err != nil {
-		log.Fatalln(err)
-		return
-	}
-
-	shader, err := asset.GetAssetManager().ShaderAsset(resource.DefaultShaderID)
-	if err != nil {
-		log.Fatalln(err)
-		return
-	}
-	texture, err := asset.GetAssetManager().TextureAsset(resource.DefaultTextureID)
-	if err != nil {
-		log.Fatalln(err)
-		return
-	}
-	data, err := renderer.NewRenderObject([]types.Vector2{
-		types.NewVector2(1, 1),
-		types.NewVector2(1, -1),
-		types.NewVector2(-1, 1),
-		types.NewVector2(-1, -1),
-	},
-	[]uint32{
-		0, 1, 2, 2, 3, 1,
-	},
-	[]types.Vector2{
-		types.NewVector2(1.0,0.0),
-		types.NewVector2(1.0,1.0),
-		types.NewVector2(0.0,0.0),
-		types.NewVector2(0.0,1.0),
-	},
-	types.NewVector2(10, 10),
-	types.NewVector2(0, 10),
-	types.NewVector2(480,720),
-	renderer.NewMeterial(shader,texture),
-	)
-	if err != nil {
-		log.Fatalln(err)
-		return
-	}
-	if err := data.Init(0); err != nil {
-		log.Fatalln(err)
-		return
-	}
-
 	renderer := renderer.NewRenderer()
-	renderer.Set(data)
-	window.SetKeyCallBack(keyboard.KeyBoard)
-
-	err = window.Update(renderer)
-
+	err := window.Init(480, 720, types.NewColor(255, 255, 255, 255),renderer)
 	if err != nil {
 		log.Fatalln(err)
+		return
+	}
+
+	mesh, err := asset.GetAssetManager().MeshAsset2D(resource.DefaultMeshID)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+	material , err := asset.GetAssetManager().Material(resource.DefaultMaterialID)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+	object := window.NewObject(mesh,material,types.NewVector2(0,0),types.NewVector2(10,10))
+	window.SetKeyCallBack(keyboard.KeyBoard)
+	localX := float32(-250)
+	old := glfw.GetTime()
+	for !window.ShouldClose() {
+		new := glfw.GetTime()
+		delta := new - old
+		if delta < TargetDeltaTime {
+			continue
+		}
+		old = new
+		window.Update(delta)
+		if localX > 250 {
+			localX = -250
+		}
+		localX += float32(delta) * 100
+		window.SetLocation(object,types.NewVector2(localX,0))
 	}
 	renderer.Delete()
 }

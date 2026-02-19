@@ -27,7 +27,7 @@ func NewWorldTransform(viewportSize types.Vector2) *World {
 
 func (instance *World) Init(program types.Program) {
 	gl.BindBufferBase(gl.UNIFORM_BUFFER,WorldIndex,instance.buffer.GetDataBuffer())
-	gl.UniformBlockBinding(uint32(program),WorldIndex,WorldIndex)
+	gl.UniformBlockBinding(uint32(program),0,WorldIndex)
 }
 
 func (instance *World) SetViewportSize(size types.Vector2) {

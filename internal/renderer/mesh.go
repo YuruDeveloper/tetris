@@ -4,6 +4,7 @@ import (
 	"unsafe"
 
 	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
+	"github.com/YuruDeveloper/tetris/internal/ports"
 	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
 )
@@ -19,7 +20,7 @@ type Mesh[T types.Vector] struct {
 	vertexArrayObject uint32
 }
 
-func NewMesh[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2) (*Mesh[T], error) {
+func NewMesh[T types.Vector](vertex []T, indices []uint32,uv []types.Vector2) (ports.Mesh[T], error) {
 	vertexBuffer, err := NewBufferWithDatas(vertex,0)
 	if err != nil {
 		return nil, err
@@ -52,19 +53,18 @@ func (instance *Mesh[T]) Init() error {
 	if count < 2 || count > 4 {
 		return packagederror.NewError(packagederror.UnSupportedDataType, "This Type is not supported")
 	}
-	// location 열기
 	gl.EnableVertexArrayAttrib(instance.vertexArrayObject, VertexBufferObjectIndex)
 	gl.EnableVertexArrayAttrib(instance.vertexArrayObject, UVBufferIndex)
-	// vao binding and format setup
+
 	gl.VertexArrayVertexBuffer(instance.vertexArrayObject, VertexBufferObjectIndex, instance.vertexBuffer.GetDataBuffer(), 0, size)
 	gl.VertexArrayAttribFormat(instance.vertexArrayObject, VertexBufferObjectIndex, count, gl.FLOAT, false, 0)
-	// vao binding and format setup
-	gl.VertexArrayVertexBuffer(instance.vertexArrayObject,UVBufferIndex,instance.uvBuffer.GetDataBuffer(),0,int32(FloatDataSize * 2))
-	gl.VertexArrayAttribFormat(instance.vertexArrayObject,UVBufferIndex,2,gl.FLOAT,false,0)
-	//	binding
+
+	gl.VertexArrayVertexBuffer(instance.vertexArrayObject, UVBufferIndex, instance.uvBuffer.GetDataBuffer(), 0, int32(FloatDataSize*2))
+	gl.VertexArrayAttribFormat(instance.vertexArrayObject, UVBufferIndex, 2, gl.FLOAT, false, 0)
+
 	gl.VertexArrayAttribBinding(instance.vertexArrayObject, VertexBufferObjectIndex, VertexBufferObjectIndex)
-	gl.VertexArrayAttribBinding(instance.vertexArrayObject,UVBufferIndex,UVBufferIndex)
-	// 
+	gl.VertexArrayAttribBinding(instance.vertexArrayObject, UVBufferIndex, UVBufferIndex)
+
 	gl.VertexArrayElementBuffer(instance.vertexArrayObject, instance.indicesBuffer.GetDataBuffer())
 
 	gl.VertexArrayBindingDivisor(instance.vertexArrayObject, VertexBufferObjectIndex, 0)

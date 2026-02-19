@@ -9,8 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const TargetFPS = 144.0
-const TargetDeltaTime = 1.0 / TargetFPS
+
 
 func NewWindow() *Window {
 	return &Window{}
@@ -45,7 +44,7 @@ func (instance *Window) Init(width int, height int, color types.Color,renderer p
 	glfw.SwapInterval(0)
 	floatColor := color.GetColor()
 	gl.ClearColor(floatColor.Red, floatColor.Green, floatColor.Blue, floatColor.Alpha)
-	
+	renderer.Init(types.NewVector2(float32(width),float32(height)))
 	return nil
 }
 
@@ -65,6 +64,10 @@ func (instance *Window) Update(deltaTime float64) {
 	instance.renderer.Rendering(deltaTime)
 	instance.window.SwapBuffers()
 	glfw.PollEvents()
+}
+
+func (instance *Window) ShouldClose() bool {
+	return instance.window.ShouldClose()
 }
 
 func (instance *Window) Close() {

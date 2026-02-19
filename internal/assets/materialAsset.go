@@ -8,6 +8,13 @@ import (
 
 var _ ports.Asset = (*MaterialAsset)(nil)
 
+func NewMaterialAsset(createFunction func(program *types.Reference[types.Program],texture *types.Reference[types.Texture]) ports.Material,shader *types.Reference[types.Program],texture *types.Reference[types.Texture]) *MaterialAsset {
+	return &MaterialAsset{
+		material: createFunction(shader,texture),
+		IsLoad: false,
+	}
+}
+
 type MaterialAsset struct {
 	material ports.Material
 	IsLoad bool
