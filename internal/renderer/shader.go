@@ -105,4 +105,5 @@ func (instance *Shader) Delete() {
 		return
 	}
 	gl.DeleteProgram(instance.program)
+	instance.program = 0
 }

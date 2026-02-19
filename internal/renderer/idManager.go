@@ -19,8 +19,9 @@ func (instance *IDManager) Get() int {
 		instance.idCount++
 		return id
 	}
-	id = instance.freeList[0]
-	instance.freeList = instance.freeList[1:]
+	last := len(instance.freeList) -1
+	id = instance.freeList[last]
+	instance.freeList = instance.freeList[:last]
 	return id
 }
 

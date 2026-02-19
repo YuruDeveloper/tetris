@@ -21,24 +21,18 @@ func main() {
 	manager := asset.GetAssetManager()
 	resource.Init(manager)
 	window := window.NewWindow()
-	renderer := renderer.NewRenderer()
+	renderer := renderer.NewRenderer(manager)
 	err := window.Init(480, 720, types.NewColor(255, 255, 255, 255),renderer)
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
-
-	mesh, err := asset.GetAssetManager().MeshAsset2D(resource.DefaultMeshID)
+	object , err := window.NewObject(0,resource.DefaultMeshID,resource.DefaultMaterialID,types.NewVector2(0,0),types.NewVector2(10,10))
 	if err != nil {
+		window.Close()
 		log.Fatalln(err)
 		return
 	}
-	material , err := asset.GetAssetManager().Material(resource.DefaultMaterialID)
-	if err != nil {
-		log.Fatalln(err)
-		return
-	}
-	object := window.NewObject(0,mesh,material,types.NewVector2(0,0),types.NewVector2(10,10))
 	window.SetKeyCallBack(keyboard.KeyBoard)
 	localX := float32(-250)
 	old := glfw.GetTime()
@@ -56,5 +50,5 @@ func main() {
 		localX += float32(delta) * 100
 		window.SetLocation(object,types.NewVector2(localX,0))
 	}
-	renderer.Delete()
+	window.Close()
 }

@@ -48,8 +48,8 @@ func (instance *Window) Init(width int, height int, color types.Color,renderer p
 	return nil
 }
 
-func (instance *Window) NewObject(order int,mesh *types.Reference[types.Mesh],material *types.Handle[types.Material],location,size types.Vector2) uuid.UUID {
-	return instance.renderer.NewObject(order,mesh,material,location,size)
+func (instance *Window) NewObject(order int,meshID uuid.UUID,materialID uuid.UUID,location,size types.Vector2) (uuid.UUID , error){
+	return instance.renderer.NewObject(order,meshID,materialID,location,size)
 }
 
 func (instance *Window) DeleteObject(uuid uuid.UUID) {
@@ -79,6 +79,7 @@ func (instance *Window) Close() {
 		return
 	}
 	instance.window.SetShouldClose(true)
+	instance.renderer.Delete()
 	glfw.Terminate()
 }
 

@@ -29,6 +29,7 @@ const (
 	UnknownAsset = 500
 	FailAssetTypeConvert = 501
 	FailRegisterDuplicate = 502
+	FailLoadAsset = 503
 )
 
 func NewError(code ErrorCode, str string) *PackagedError {

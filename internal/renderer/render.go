@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	packagederror "github.com/YuruDeveloper/tetris/internal/packagedError"
 	"github.com/YuruDeveloper/tetris/internal/ports"
 	"github.com/YuruDeveloper/tetris/internal/types"
 	"github.com/go-gl/gl/v4.6-core/gl"
@@ -9,18 +10,20 @@ import (
 
 var _ ports.Renderer = (*Renderer)(nil)
 
-func NewRenderer() *Renderer {
+func NewRenderer(manager ports.Manager) *Renderer {
 	return &Renderer{
 		objects: make([]map[uuid.UUID]*RenderObject, 0),
 		idList: make(map[uuid.UUID]int),
 		sync:      NewSync(),	
 		idManager: NewIDManager(),
+		assetManager: manager,
 	}
 }
 
 type Renderer struct {
 	objects []map[uuid.UUID]*RenderObject
 	idList map[uuid.UUID]int
+	assetManager ports.Manager
 	idManager *IDManager
 	transform *Transform2D
 	sync           *Sync
@@ -33,7 +36,16 @@ func (instance *Renderer) Init(viewport types.Vector2) {
 	instance.transform = NewTransform()
 }
 
-func (instance *Renderer) NewObject(order int,mesh *types.Reference[types.Mesh],material *types.Handle[types.Material],location,size types.Vector2) uuid.UUID {
+func (instance *Renderer) NewObject(order int,meshID uuid.UUID,materialId uuid.UUID ,location,size types.Vector2) (uuid.UUID , error) {
+	mesh ,err := instance.assetManager.MeshAsset2D(meshID)
+	if err != nil {
+		return uuid.Nil , packagederror.NewError(packagederror.FailLoadAsset,err.Error())
+	}
+	material , err := instance.assetManager.Material(materialId)
+	if err != nil {
+		mesh.Delete()
+		return uuid.Nil , packagederror.NewError(packagederror.FailLoadAsset,err.Error())
+	}
 	for order >= len(instance.objects) {
 		instance.objects = append(instance.objects,make(map[uuid.UUID]*RenderObject))
 	}
@@ -42,7 +54,7 @@ func (instance *Renderer) NewObject(order int,mesh *types.Reference[types.Mesh],
 	instance.idList[uuid] = id
 	instance.transform.NewTransform(id,types.PackedTransform[types.Vector2]{ Size: size,Location : location })
 	instance.objects[order][uuid] = NewRenderObject(uint32(id),mesh,material,instance.world,instance.transform)
-	return uuid
+	return uuid , nil
 }
 
 func (instance *Renderer) DeleteObject(uuid uuid.UUID) {
@@ -57,11 +69,15 @@ func (instance *Renderer) DeleteObject(uuid uuid.UUID) {
 }
 
 func (instance *Renderer) SetSize(uuid uuid.UUID,size types.Vector2) {
-	instance.transform.SetSize(instance.idList[uuid],size)
+	if id , ok := instance.idList[uuid] ; ok {
+		instance.transform.SetSize(id,size)
+	}
 }
 
 func (instance *Renderer) SetLocation(uuid uuid.UUID,location types.Vector2) {
-	instance.transform.SetLocation(instance.idList[uuid],location)
+	if id , ok := instance.idList[uuid] ; ok {
+		instance.transform.SetLocation(id,location)
+	}
 }
 
 func (instance *Renderer) Rendering(deltaTime float64) {

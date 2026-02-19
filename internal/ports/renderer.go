@@ -7,8 +7,9 @@ import (
 
 type Renderer interface {
 	Init(viewport types.Vector2)
+	Delete()
 	Rendering(deltaTime float64)
-	NewObject(order int,mesh *types.Reference[types.Mesh],material *types.Handle[types.Material],location,size types.Vector2) uuid.UUID
+	NewObject(order int,meshID uuid.UUID,materialId uuid.UUID ,location,size types.Vector2) (uuid.UUID , error)
 	DeleteObject(uuid uuid.UUID)
 	SetSize(uuid uuid.UUID,size types.Vector2)
 	SetLocation(uuid uuid.UUID,location types.Vector2)
