@@ -32,7 +32,8 @@ func NewTransform() *Transform2D {
 }
 
 func (instance *Transform2D) Bind(program types.Program) {
-	gl.ShaderStorageBlockBinding(uint32(program),0,TransformIndex)
+	index := gl.GetProgramResourceIndex(uint32(program),gl.SHADER_STORAGE_BLOCK,gl.Str("TranformBlock\x00"))
+	gl.ShaderStorageBlockBinding(uint32(program),index,TransformIndex)
 }
 
 func (instance *Transform2D) resize() {

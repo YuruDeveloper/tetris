@@ -35,20 +35,25 @@ func Init(manager ports.Manager) {
 		return asset.NewMaterialAsset(renderer.NewMaterial,shader,texture)
 	}))
 	must(manager.Register(DefaultMeshID,func() ports.Asset {
-		return asset.New2DMeshAssetWithValues(renderer.NewMesh,[]types.Vector2{
-		types.NewVector2(1, 1),
-		types.NewVector2(1, -1),
-		types.NewVector2(-1, 1),
-		types.NewVector2(-1, -1),
-	},
-	[]uint32{
-		0, 1, 2, 2, 3, 1,
-	},
-	[]types.Vector2{
-		types.NewVector2(1.0,0.0),
-		types.NewVector2(1.0,1.0),
-		types.NewVector2(0.0,0.0),
-		types.NewVector2(0.0,1.0),
-	},)
+		asset , err := asset.New2DMeshAssetWithValues(
+			renderer.NewMesh,
+			[]types.Vector2{
+				types.NewVector2(1, 1),
+				types.NewVector2(1, -1),
+				types.NewVector2(-1, 1),
+				types.NewVector2(-1, -1),
+			},
+			[]uint32{
+				0, 1, 2, 2, 3, 1,
+			},
+			[]types.Vector2{
+				types.NewVector2(1.0,0.0),
+				types.NewVector2(1.0,1.0),
+				types.NewVector2(0.0,0.0),
+				types.NewVector2(0.0,1.0),
+			},
+		)
+		must(err)
+		return asset
 	}))
 }

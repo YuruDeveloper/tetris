@@ -27,6 +27,7 @@ type Renderer struct {
 
 func (instance *Renderer) Init(viewport types.Vector2) {
 	instance.world = NewWorldTransform(viewport)
+	instance.world.Init()
 	instance.transform = NewTransform()
 }
 
@@ -36,7 +37,6 @@ func (instance *Renderer) NewObject(mesh *types.Reference[types.Mesh],material *
 	instance.idList[uuid] = id
 	instance.transform.NewTransform(id,types.PackedTransform[types.Vector2]{ Size: size,Location : location })
 	instance.datas[uuid] = NewRenderObject(uint32(id),mesh,material,instance.world,instance.transform)
-	instance.datas[uuid].Init()
 	return uuid
 }
 
@@ -61,6 +61,7 @@ func (instance *Renderer) Delete() {
 	for _, data := range instance.datas {
 		data.Delete()
 	}
+	instance.transform.Delete()
 	instance.world.Delete()
 	instance.sync.Delete()
 }

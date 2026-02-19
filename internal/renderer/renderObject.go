@@ -25,16 +25,12 @@ type RenderObject struct {
 	material *types.Handle[types.Meterial]
 }
 
-func (instance *RenderObject) Init()  {
-	material  := instance.material.Get() 
-	instance.world.Init(material.Program)
-}
-
 func (instance *RenderObject) Rendering() {
 	mesh := instance.mesh.Get()
-	mat := instance.material.Get()
+	program := instance.material.Get().Program
 	instance.material.Render()
-	instance.transform.Bind(mat.Program)
+	instance.world.Bind(program)
+	instance.transform.Bind(program)
 	gl.BindVertexArray(uint32(mesh.VertexArrayObject))
 	gl.DrawElementsInstancedBaseInstance(gl.TRIANGLES, mesh.IndciesCount, gl.UNSIGNED_INT, unsafe.Pointer(nil), 1, instance.id)
 }
