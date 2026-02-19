@@ -38,7 +38,7 @@ func main() {
 		log.Fatalln(err)
 		return
 	}
-	object := window.NewObject(mesh,material,types.NewVector2(0,0),types.NewVector2(10,10))
+	object := window.NewObject(0,mesh,material,types.NewVector2(0,0),types.NewVector2(10,10))
 	window.SetKeyCallBack(keyboard.KeyBoard)
 	localX := float32(-250)
 	old := glfw.GetTime()

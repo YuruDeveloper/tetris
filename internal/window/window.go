@@ -48,8 +48,8 @@ func (instance *Window) Init(width int, height int, color types.Color,renderer p
 	return nil
 }
 
-func (instance *Window) NewObject(mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],location,size types.Vector2) uuid.UUID {
-	return instance.renderer.NewObject(mesh,material,location,size)
+func (instance *Window) NewObject(order int,mesh *types.Reference[types.Mesh],material *types.Handle[types.Meterial],location,size types.Vector2) uuid.UUID {
+	return instance.renderer.NewObject(order,mesh,material,location,size)
 }
 
 func (instance *Window) SetLocation(uuid uuid.UUID,location types.Vector2) {
