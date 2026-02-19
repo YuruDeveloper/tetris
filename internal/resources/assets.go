@@ -32,7 +32,7 @@ func Init(manager ports.Manager) {
 		must(err)
 		texture, err := manager.TextureAsset(DefaultTextureID)
 		must(err)
-		return asset.NewMaterialAsset(renderer.NewMaterial,shader,texture)
+		return asset.NewMaterialAsset(renderer.NewMaterial,types.NewColor(255,0,0,255),shader,texture)
 	}))
 	must(manager.Register(DefaultMeshID,func() ports.Asset {
 		asset , err := asset.New2DMeshAssetWithValues(

@@ -8,9 +8,9 @@ import (
 
 var _ ports.Asset = (*MaterialAsset)(nil)
 
-func NewMaterialAsset(createFunction func(program *types.Reference[types.Program],texture *types.Reference[types.Texture]) ports.Material,shader *types.Reference[types.Program],texture *types.Reference[types.Texture]) *MaterialAsset {
+func NewMaterialAsset(createFunction func(color types.Color,program *types.Reference[types.Program],texture *types.Reference[types.Texture]) ports.Material,color types.Color,shader *types.Reference[types.Program],texture *types.Reference[types.Texture]) *MaterialAsset {
 	return &MaterialAsset{
-		material: createFunction(shader,texture),
+		material: createFunction(color,shader,texture),
 		IsLoad: false,
 	}
 }
@@ -43,6 +43,7 @@ func (instance *MaterialAsset) Get() types.Meterial {
 func (instance *MaterialAsset) GetRenderer() func(types.Meterial) {
 	return func(meterial types.Meterial) {
 		gl.UseProgram(uint32(meterial.Program))
+		gl.Uniform4f(meterial.ColorLocation,meterial.Color.Red,meterial.Color.Green,meterial.Color.Blue,meterial.Color.Alpha)
 		gl.ActiveTexture(gl.TEXTURE0)
 		gl.BindTexture(gl.TEXTURE_2D,uint32(meterial.Texture))
 	}

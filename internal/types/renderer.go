@@ -43,6 +43,8 @@ type Mesh struct {
 type Meterial struct {
 	Program Program
 	Texture Texture
+	Color ColorFloat
+	ColorLocation int32
 }
 
 type VertexArrayObject uint32
